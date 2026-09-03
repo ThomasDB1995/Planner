@@ -1,0 +1,29 @@
+{
+  "projectName": "Perceel Werkplanning & Materieelbeheer",
+  "projectSlug": "perceel-werkplanning-materieelbeheer",
+  "answers": {
+    "projectnaam": "Perceel Werkplanning & Materieelbeheer",
+    "projectdoel": "De planning van werknemers, machines en voertuigen centraliseren zodat planners sneller kunnen werken, minder fouten maken en realtime overzicht hebben over beschikbaarheden en conflicten.\n\n---",
+    "huidige-werkwijze": "Momenteel gebeurt de planning in een gedeeld Excelbestand via SharePoint waar meerdere mensen tegelijk wijzigingen kunnen uitvoeren.",
+    "huidige-knelpunten": "Er is weinig overzicht bij grotere planning. Machines kunnen dubbel ingepland worden zonder waarschuwing. Defecte machines worden manueel gecontroleerd. Beschikbaarheden zijn moeilijk opvolgbaar en wijzigingen zorgen regelmatig voor fouten of verwarring.\n\n---",
+    "primaire-gebruikers": "Mickaël, Bram, Ronny, Kim en Thomas. Mickaël is hoofdverantwoordelijke voor de planning.",
+    "rollen": "Planner:\n- werknemers plannen\n- projecten beheren\n- machines toewijzen\n- planningen bevestigen\n\nBeheerder:\n- werknemers beheren\n- machines beheren\n- voertuigen beheren\n- beschikbaarheden aanpassen\n\nGebruiker:\n- planning bekijken\n- status opvolgen\n\n---",
+    "hoofdfuncties": "- werknemersplanning\n- projecten/taken koppelen\n- machines koppelen\n- voertuigen koppelen\n- afwezigheden registreren\n- ziekte registreren\n- dubbele boekingen detecteren\n- defecte machines blokkeren\n- voorlopige/bevestigde planningstatus\n- opmerkingen toevoegen\n- duidelijke conflictwaarschuwingen",
+    "niet-in-scope": "- mobiele app\n- AI-planning\n- cloudplatform\n- automatische notificaties\n- realtime GPS tracking\n- geavanceerde rapportering\n- multi-company ondersteuning\n\n---",
+    "input-data": "- werknemers\n- projecten\n- taken\n- machines\n- voertuigen\n- beschikbaarheden\n- afwezigheden\n- defectstatussen",
+    "output-data": "- dagplanning\n- machinebeschikbaarheid\n- voertuigbeschikbaarheid\n- waarschuwingen\n- planningstatus\n- opmerkingen\n- conflictmeldingen\n\n---",
+    "processtappen": "1. Planner kiest een datum.\n2. Planner kiest een werknemer.\n3. Planner koppelt een taak of project.\n4. Planner koppelt machines of voertuigen.\n5. Het systeem controleert conflicten en beschikbaarheden.\n6. Bij problemen verschijnt een waarschuwing.\n7. Planner markeert planning als voorlopig of bevestigd.\n8. Na uitvoering wordt het werk bevestigd als uitgevoerd.",
+    "goedkeuringen": "- definitieve bevestiging van planning\n- bevestiging dat werk uitgevoerd is\n- uitzonderingen bij conflicten of defecte machines\n\n---",
+    "integraties-v1": "Geen externe integraties verplicht in v1.",
+    "import-export": "- Excel export\n- PDF export\n- latere uitbreidbaarheid voor rapportering\n\n---",
+    "designstijl": "Desktop-first interne tool met focus op snelheid, overzicht en eenvoudige bediening. Geen complexe UI of overbodige visuele effecten.",
+    "schermen": "- dagplanning\n- weekplanning\n- werknemersoverzicht\n- machineoverzicht\n- voertuigoverzicht\n- conflictmeldingen\n- beschikbaarheidsoverzicht\n\n---",
+    "technische-eisen": "- desktop-first\n- snelle interface\n- betrouwbare validaties\n- veilige opslag\n- conflictcontrole\n- stabiele werking zonder dataverlies",
+    "omgeving": "Intern desktopgebruik binnen Perceel.\n\n---",
+    "grootste-risicos": "- verlies van planningdata\n- dubbele boekingen\n- foutieve beschikbaarheden\n- defecte machines toch ingepland\n- systeemuitval tijdens planning",
+    "kritieke-processen": "- planning opslaan\n- conflictcontrole\n- machinevalidatie\n- beschikbaarheidscontrole\n\n---",
+    "minimale-v1": "- werknemersplanning\n- projecten/taken koppelen\n- machines koppelen\n- voertuigen koppelen\n- afwezigheden registreren\n- ziekte registreren\n- dubbele boeking detecteren\n- defecte machine waarschuwingen\n- voorlopige/bevestigde planningstatus\n- desktopversie",
+    "latere-uitbreidingen": "- mobiele raadpleging\n- notificaties\n- onderhoudsintegraties\n- rapportering\n- AI-ondersteunde suggesties\n- geavanceerde dashboards"
+  },
+  "createdAt": "2026-05-18T19:31:54.763Z"
+}
