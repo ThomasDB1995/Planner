@@ -14,6 +14,11 @@ function getConflictLabel(conflict: PlanningConflict): string {
   return "Dubbel";
 }
 
+function getUserInitial(email: string): string {
+  const localPart = email.split("@")[0]?.trim() ?? "";
+  return localPart.charAt(0).toUpperCase();
+}
+
 export function PlanningCard({
   item,
   resources,
@@ -33,11 +38,8 @@ export function PlanningCard({
   const resourceTitle = resources
     .map((resource) => getResourceDisplayLabel(resource))
     .join("\n");
-  const auditLabel = item.updatedByEmail
-    ? `Gewijzigd: ${item.updatedByEmail}`
-    : item.createdByEmail
-      ? `Aangemaakt: ${item.createdByEmail}`
-      : "";
+  const auditEmail = item.updatedByEmail ?? item.createdByEmail ?? "";
+  const auditInitial = auditEmail ? getUserInitial(auditEmail) : "";
   const auditTitle = [
     item.createdByEmail ? `Aangemaakt door ${item.createdByEmail}` : "",
     item.updatedByEmail ? `Gewijzigd door ${item.updatedByEmail}` : ""
@@ -47,7 +49,9 @@ export function PlanningCard({
 
   return (
     <article
-      className={`border-l-4 border-slate-300 bg-white px-1.5 py-0.5 text-xs leading-4 text-slate-700 ${selectedStyle}`}
+      className={`relative border-l-4 border-slate-300 bg-white px-1.5 py-0.5 text-xs leading-4 text-slate-700 ${
+        auditInitial ? "pb-3 pr-6" : ""
+      } ${selectedStyle}`}
       data-selected={isSelected ? "true" : "false"}
       onClick={(event) => {
         event.stopPropagation();
@@ -105,13 +109,14 @@ export function PlanningCard({
           ))}
         </div>
       ) : null}
-      {auditLabel ? (
-        <p
-          className="mt-0.5 truncate text-[10px] font-medium leading-3 text-slate-400"
+      {auditInitial ? (
+        <span
+          aria-label={auditTitle}
+          className="absolute bottom-0.5 right-1 flex h-4 min-w-4 items-center justify-center rounded border border-slate-200 bg-slate-50 px-1 text-[10px] font-bold leading-none text-slate-500"
           title={auditTitle}
         >
-          {auditLabel}
-        </p>
+          {auditInitial}
+        </span>
       ) : null}
     </article>
   );
