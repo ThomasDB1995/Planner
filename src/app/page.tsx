@@ -36,10 +36,12 @@ import {
   getWorkWeek
 } from "@/lib/planning/week";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { fetchPlannerEmployees } from "@/lib/supabase/employees";
 import { fetchPlannerResources } from "@/lib/supabase/resources";
 import type { PlanningItem, Resource } from "@/types/planning";
 
 type ResourceLoadState = "idle" | "loading" | "ready" | "error";
+type EmployeeLoadState = "idle" | "loading" | "ready" | "error";
 
 export default function Home() {
   const [plannerEmployees, setPlannerEmployees] = useState(() => employees);
@@ -47,6 +49,8 @@ export default function Home() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [resourceLoadState, setResourceLoadState] =
     useState<ResourceLoadState>("idle");
+  const [employeeLoadState, setEmployeeLoadState] =
+    useState<EmployeeLoadState>("idle");
   const [showHiddenEmployees, setShowHiddenEmployees] = useState(false);
   const [showWeekEmployeePanel, setShowWeekEmployeePanel] = useState(false);
   const [weekEmployeeToAddId, setWeekEmployeeToAddId] = useState("");
@@ -82,6 +86,14 @@ export default function Home() {
           : hasSupabaseConnection
             ? "Supabase ingesteld"
             : "Supabase niet ingesteld";
+  const employeeStatusLabel =
+    employeeLoadState === "ready"
+      ? `${plannerEmployees.length} werknemers`
+      : employeeLoadState === "loading"
+        ? "werknemers laden"
+        : employeeLoadState === "error"
+          ? "werknemers fallback"
+          : `${plannerEmployees.length} werknemers`;
   const activeWeekKey = getIsoWeekKey(currentWeekStartDate);
   const activeWeeklyEmployeeIds = weeklyEmployeeIdsByWeek[activeWeekKey] ?? [];
   const visibleWeekDates = new Set(days.map((day) => day.date));
@@ -177,7 +189,6 @@ export default function Home() {
 
   useEffect(() => {
     if (!hasSupabaseConnection || !authSession) {
-      setResources([]);
       setResourceLoadState("idle");
       return;
     }
@@ -202,6 +213,38 @@ export default function Home() {
 
         setResources([]);
         setResourceLoadState("error");
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authSession, hasSupabaseConnection]);
+
+  useEffect(() => {
+    if (!hasSupabaseConnection || !authSession) {
+      setEmployeeLoadState("idle");
+      return;
+    }
+
+    let isMounted = true;
+
+    setEmployeeLoadState("loading");
+
+    fetchPlannerEmployees()
+      .then((nextEmployees) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setPlannerEmployees(nextEmployees);
+        setEmployeeLoadState("ready");
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setEmployeeLoadState("error");
       });
 
     return () => {
@@ -488,6 +531,9 @@ export default function Home() {
               </div>
               <p className="w-fit rounded border border-emerald-100 bg-emerald-50 px-2 py-1 text-xs font-semibold text-slate-600">
                 Datalaag: {resourceStatusLabel}
+              </p>
+              <p className="w-fit rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-600">
+                Werknemers: {employeeStatusLabel}
               </p>
             </div>
           </header>

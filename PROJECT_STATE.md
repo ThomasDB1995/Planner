@@ -2,13 +2,13 @@
 
 ## Projectstatus
 
-Status: Final Planner Polish voor praktijkgebruik afgerond
+Status: Planner klaar voor praktijkgebruik met Supabase resources en werknemers
 
 ---
 
 ## Current Sprint
 
-Geen actieve implementatiesprint. Sprint 32 is afgerond en de zichtbare WorkCard structuurdemo is uit de dagelijkse planner verwijderd. WorkCard types, documentatie en backlog blijven behouden. Planner focust opnieuw op planning, zonder editor, werkbon, nacalculatie, backend/API of persistence.
+Geen actieve implementatiesprint. Sprint 32 is afgerond en de zichtbare WorkCard structuurdemo is uit de dagelijkse planner verwijderd. WorkCard types, documentatie en backlog blijven behouden. Planner focust opnieuw op planning. Resources en werknemers worden na login uit Supabase gelezen; lokale planneracties zoals planningitems, availability, weektoevoegingen en hide/show blijven voorlopig in-memory.
 
 ---
 
@@ -97,6 +97,14 @@ Geen actief implementatieticket. Sprint 32 T3201, T3202 en T3203 zijn afgerond e
 - Availability, selected cell, relocation en planningcards blijven dominant boven row shading
 - Sprint 31 QA groen via helper/build/smoke; volledige interactieve browserautomatie beperkt omdat Playwright-runtime `playwright-core` mist
 - Sprint 31 documentatie afgerond
+- Supabase employee catalog aangesloten
+- `public.employees` toegevoegd als lightweight planner-werknemerstabel
+- 32 werknemers geimporteerd in Supabase
+- Employee mapping behouden: `id`, `firstName`, `lastName`, `name`, `category`, `sortOrder`, `isDefaultVisible`, `isHidden`
+- App leest werknemers na login uit Supabase met bestaande seeddata als fallback
+- Geen employee writes vanuit de app toegevoegd; lokaal toevoegen/verbergen/tonen en weektoevoegingen blijven in-memory
+- Geen HR-module, payroll, contractstatus, permissions of hard-delete gedrag toegevoegd
+- Build groen na Supabase employee catalog integratie
 - Sprint 30 Weekgebonden Werknemers afgerond
 - Matrix toont kernploeg plus werknemers tijdelijk toegevoegd aan actieve ISO-week
 - Dagelijkse UI gebruikt `+ Aan deze week toevoegen` en `Uit deze week`

@@ -1,0 +1,54 @@
+-- Supabase employee catalog seed.
+-- Run after employees_schema.sql. Safe to rerun: existing ids are updated.
+
+insert into public.employees (
+  id,
+  first_name,
+  last_name,
+  name,
+  category,
+  sort_order,
+  is_default_visible,
+  is_hidden
+)
+values
+  ('employee-luc-van-den-acker', 'Luc Van Den Acker', '', 'Luc Van Den Acker', 'Werknemer', 1, true, false),
+  ('employee-henri-stevens', 'Henri Stevens', '', 'Henri Stevens', 'Werknemer', 2, true, false),
+  ('employee-michel-verhoeven', 'Michel Verhoeven', '', 'Michel Verhoeven', 'Werknemer', 3, true, false),
+  ('employee-arno-de-bleser', 'Arno De Bleser', '', 'Arno De Bleser', 'Werknemer', 4, true, false),
+  ('employee-wim-van-riet', 'Wim Van Riet', '', 'Wim Van Riet', 'Zelfstandige', 5, true, false),
+  ('employee-felix-schelfhout', 'Felix Schelfhout', '', 'Felix Schelfhout', 'Zelfstandige', 6, true, false),
+  ('employee-eric-maes', 'Eric Maes', '', 'Eric Maes', 'Flexi-job', 7, true, false),
+  ('employee-jan-van-ranst', 'Jan Van Ranst', '', 'Jan Van Ranst', 'Flexi-job', 8, true, false),
+  ('employee-sem-lambrechts', 'Sem Lambrechts', '', 'Sem Lambrechts', 'Zelfstandige', 9, true, false),
+  ('employee-marc-moens', 'Marc Moens', '', 'Marc Moens', 'Zelfstandige', 10, false, false),
+  ('employee-kim-jacobs', 'Kim Jacobs', '', 'Kim Jacobs', 'Zelfstandige', 11, false, false),
+  ('employee-de-wit-bert', 'Bert De Wit', '', 'Bert De Wit', 'Zelfstandige', 12, false, false),
+  ('employee-kris-van-de-woestyne', 'Kris Van de Woestyne', '', 'Kris Van de Woestyne', 'Zelfstandige', 13, false, false),
+  ('employee-stan-van-de-woestyne', 'Stan Van De Woestyne', '', 'Stan Van De Woestyne', 'Zelfstandige', 14, false, false),
+  ('employee-vincent-verhoeven', 'Vincent Verhoeven', '', 'Vincent Verhoeven', 'Zelfstandige', 15, false, false),
+  ('employee-sablon-philip', 'Philip Sablon', '', 'Philip Sablon', 'Zelfstandige', 16, false, false),
+  ('employee-bram-de-coster', 'Bram De Coster', '', 'Bram De Coster', 'Werknemer, bureau', 17, true, false),
+  ('employee-mickael-kestemont', 'Mickaël Kestemont', '', 'Mickaël Kestemont', 'Werknemer, bureau', 18, true, false),
+  ('employee-kim-swinnen', 'Kim Swinnen', '', 'Kim Swinnen', 'Werknemer, bureau', 19, true, false),
+  ('employee-ronny-lambrechts', 'Ronny Lambrechts', '', 'Ronny Lambrechts', 'Werknemer, bureau', 20, true, false),
+  ('employee-thomas-de-bleser', 'Thomas De Bleser', '', 'Thomas De Bleser', 'Werknemer, bureau', 21, true, false),
+  ('employee-raymond-leroy', 'Raymond Leroy', '', 'Raymond Leroy', 'Flexi-job', 22, false, false),
+  ('employee-de-smet-jonathan', 'Jonathan De Smet', '', 'Jonathan De Smet', 'Flexi-job', 23, false, false),
+  ('employee-hoofd-stef', 'Stef Hoofd', '', 'Stef Hoofd', 'Flexi-job', 24, false, false),
+  ('employee-hermans-jelle', 'Jelle Hermans', '', 'Jelle Hermans', 'Flexi-job', 25, false, false),
+  ('employee-de-landtsheer-sander', 'Sander De Landtsheer', '', 'Sander De Landtsheer', 'Flexi-job', 26, false, false),
+  ('employee-vandendriessche-rens', 'Rens Vandendriessche', '', 'Rens Vandendriessche', 'Flexi-job', 27, false, false),
+  ('employee-goossens-dries', 'Dries Goossens', '', 'Dries Goossens', 'Flexi-job', 28, false, false),
+  ('employee-van-lent-sam', 'Sam Van Lent', '', 'Sam Van Lent', 'Flexi-job', 29, false, false),
+  ('employee-carine-borms', 'Carine Borms', '', 'Carine Borms', 'Flexi-job', 30, false, false),
+  ('employee-frans-de-bleser', 'Frans De Bleser', '', 'Frans De Bleser', 'Flexi-job', 31, false, false),
+  ('employee-michiel-maes', 'Michiel Maes', '', 'Michiel Maes', 'Vakantiejob', 33, false, false)
+on conflict (id) do update set
+  first_name = excluded.first_name,
+  last_name = excluded.last_name,
+  name = excluded.name,
+  category = excluded.category,
+  sort_order = excluded.sort_order,
+  is_default_visible = excluded.is_default_visible,
+  updated_at = now();
