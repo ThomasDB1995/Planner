@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Perceel Planner">
+  <rect width="512" height="512" rx="96" fill="#006b4e"/>
+  <rect x="56" y="56" width="400" height="400" rx="72" fill="#f5fbf7"/>
+  <path d="M144 154h134c60 0 96 32 96 84s-36 84-96 84h-62v86h-72V154Zm128 110c20 0 31-10 31-26s-11-26-31-26h-56v52h56Z" fill="#006b4e"/>
+  <path d="M316 344h72v64h-72z" fill="#006b4e"/>
+</svg>
