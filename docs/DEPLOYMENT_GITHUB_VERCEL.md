@@ -45,9 +45,23 @@ Gebruik bij voorkeur de Vercel GitHub-integratie:
 5. Framework preset: `Next.js`.
 6. Install command: `npm ci`.
 7. Build command: `npm run build`.
-8. Production branch: `main`.
+8. Node.js version: Node 22 of nieuwer binnen de projectrange `>=22 <25`.
+9. Production branch: `main`.
 
 Na deze koppeling deployt Vercel automatisch bij elke push naar `main`.
+
+## Supabase environment variables
+
+Voor Supabase-integratie zijn in Vercel deze projectvariabelen nodig:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://ovaqfqyfqjoikrikbcvt.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+```
+
+Gebruik geen service role key in de browserclient.
+
+Zie ook `docs/SUPABASE_SETUP.md`.
 
 ## Deploy vanuit Codex
 

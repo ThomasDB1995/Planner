@@ -33,6 +33,7 @@ import {
   getIsoWeekKey,
   getWorkWeek
 } from "@/lib/planning/week";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
 import type { PlanningItem } from "@/types/planning";
 
 export default function Home() {
@@ -61,6 +62,7 @@ export default function Home() {
     EmployeeAvailability[]
   >([]);
   const days = getWorkWeek(currentWeekStartDate);
+  const hasSupabaseConnection = isSupabaseConfigured();
   const activeWeekKey = getIsoWeekKey(currentWeekStartDate);
   const activeWeeklyEmployeeIds = weeklyEmployeeIdsByWeek[activeWeekKey] ?? [];
   const visibleWeekDates = new Set(days.map((day) => day.date));
@@ -421,6 +423,9 @@ export default function Home() {
         <p className="mt-1 max-w-3xl text-sm leading-5 text-slate-700">
           Weekplanning van maandag tot zondag per werknemer met optioneel materieel en
           conflictwaarschuwingen.
+        </p>
+        <p className="mt-1 text-xs font-semibold text-slate-500">
+          Datalaag: {hasSupabaseConnection ? "Supabase ingesteld" : "lokaal"}
         </p>
 
         <div className="mt-3 space-y-3">

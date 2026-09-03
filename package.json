@@ -2,6 +2,9 @@
   "name": "perceel-werkplanning-materieelbeheer",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22 <25"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,6 +12,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.114.0",
     "next": "15.5.25",
     "react": "19.0.0",
     "react-dom": "19.0.0"

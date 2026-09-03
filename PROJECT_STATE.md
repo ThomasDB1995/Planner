@@ -1257,6 +1257,15 @@ Deploymentvoorbereiding is toegevoegd:
 - Vercel runtime environment variables zijn niet nodig voor deze app;
 - lokale Codex deploys gebruiken `CODEX_VERCEL_*` variabelen zodat Vercel geen `VERCEL_*` projecttokens vraagt bij GitHub-import.
 
+Supabase-connectievoorbereiding is toegevoegd:
+
+- Supabase projectref: `ovaqfqyfqjoikrikbcvt`;
+- project URL: `https://ovaqfqyfqjoikrikbcvt.supabase.co`;
+- browserclient-helper toegevoegd in `src/lib/supabase/client.ts`;
+- `@supabase/supabase-js` toegevoegd;
+- Vercel env vars nodig: `NEXT_PUBLIC_SUPABASE_URL` en `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`;
+- geen plannerdata-migratie, persistence, auth, service role key of RLS-schemawijzigingen uitgevoerd.
+
 Aanbevolen volgende richtingen, alleen na expliciete nieuwe opdracht:
 
 1. Work Card praktijkvalidatie
