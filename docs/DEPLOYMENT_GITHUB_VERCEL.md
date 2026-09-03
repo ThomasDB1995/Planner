@@ -31,7 +31,7 @@ Toegevoegd voor GitHub/Vercel:
 - `.vercelignore`: houdt deploy-upload klein door documentatie/sprintmateriaal buiten Vercel-build te houden.
 - `vercel.json`: legt Next.js framework, install en build vast.
 - `.github/workflows/ci.yml`: draait `npm ci` en `npm run build` op GitHub.
-- `.env.example`: toont welke variabelen nodig zijn voor direct deployen vanuit Codex.
+- `.env.example`: bevestigt dat de app geen Vercel runtime environment variables nodig heeft.
 - `scripts/deploy-vercel.ps1`: lokaal/Codex deployscript voor Vercel.
 
 ## Vercel koppelen
@@ -53,12 +53,12 @@ Na deze koppeling deployt Vercel automatisch bij elke push naar `main`.
 
 Voor directe deploys vanuit Codex/lokale terminal is een Vercel-token nodig.
 
-Lokale environment variables:
+Lokale environment variables, niet in Vercel invullen:
 
 ```powershell
-$env:VERCEL_TOKEN="..."
-$env:VERCEL_ORG_ID="..."
-$env:VERCEL_PROJECT_ID="..."
+$env:CODEX_VERCEL_TOKEN="..."
+$env:CODEX_VERCEL_ORG_ID="..."
+$env:CODEX_VERCEL_PROJECT_ID="..."
 ```
 
 Preview deployment:
@@ -85,7 +85,7 @@ Zo wordt er niet gedeployd wanneer de build faalt.
 
 Niet committen:
 
-- `VERCEL_TOKEN`
+- `CODEX_VERCEL_TOKEN`
 - `.env.local`
 - `.vercel/project.json`
 

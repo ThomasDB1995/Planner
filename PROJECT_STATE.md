@@ -1253,7 +1253,9 @@ Deploymentvoorbereiding is toegevoegd:
 - Vercel wordt gebruikt voor hosting;
 - `.gitignore`, `.vercelignore`, `vercel.json`, GitHub CI en een Codex/Vercel deployscript zijn toegevoegd;
 - deploymentdocumentatie staat in `docs/DEPLOYMENT_GITHUB_VERCEL.md`;
-- secrets blijven buiten de repository.
+- secrets blijven buiten de repository;
+- Vercel runtime environment variables zijn niet nodig voor deze app;
+- lokale Codex deploys gebruiken `CODEX_VERCEL_*` variabelen zodat Vercel geen `VERCEL_*` projecttokens vraagt bij GitHub-import.
 
 Aanbevolen volgende richtingen, alleen na expliciete nieuwe opdracht:
 
