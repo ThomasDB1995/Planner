@@ -164,30 +164,6 @@ export function WeekPlanningBoard({
   return (
     <section>
       <div className="mb-2 flex flex-col gap-2 rounded-md border border-perceel-line bg-white px-2 py-2 shadow-sm lg:flex-row lg:items-center lg:justify-between">
-        <div className="grid grid-cols-2 gap-1 sm:flex sm:w-auto">
-          <button
-            className={`rounded-md border px-4 py-2 text-sm font-bold shadow-sm sm:min-w-[112px] ${
-              !isEditingEnabled
-                ? "border-perceel-green bg-perceel-green text-white"
-                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
-            }`}
-            onClick={() => onSetEditingEnabled(false)}
-            type="button"
-          >
-            Bekijken
-          </button>
-          <button
-            className={`rounded-md border px-4 py-2 text-sm font-bold shadow-sm sm:min-w-[112px] ${
-              isEditingEnabled
-                ? "border-perceel-green bg-perceel-green text-white"
-                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
-            }`}
-            onClick={() => onSetEditingEnabled(true)}
-            type="button"
-          >
-            Bewerken
-          </button>
-        </div>
         <div
           aria-label={`Week ${activeWeekNumber} ${activeWeekYear}, ${weekRangeLabel}`}
           className="flex w-full max-w-none shrink-0 flex-col items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2 py-1.5 sm:max-w-[520px] lg:w-fit"
@@ -278,6 +254,30 @@ export function WeekPlanningBoard({
           ) : null}
         </div>
         <div className="flex min-h-[34px] flex-wrap items-center justify-start gap-2 lg:min-w-[260px] lg:justify-end">
+          <div className="grid w-full grid-cols-2 gap-1 sm:w-auto">
+            <button
+              className={`rounded-md border px-4 py-2 text-sm font-bold shadow-sm sm:min-w-[112px] ${
+                !isEditingEnabled
+                  ? "border-perceel-green bg-perceel-green text-white"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
+              }`}
+              onClick={() => onSetEditingEnabled(false)}
+              type="button"
+            >
+              Bekijken
+            </button>
+            <button
+              className={`rounded-md border px-4 py-2 text-sm font-bold shadow-sm sm:min-w-[112px] ${
+                isEditingEnabled
+                  ? "border-perceel-green bg-perceel-green text-white"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
+              }`}
+              onClick={() => onSetEditingEnabled(true)}
+              type="button"
+            >
+              Bewerken
+            </button>
+          </div>
           {isEditingEnabled && selectedCell ? (
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
               <button
@@ -328,9 +328,6 @@ export function WeekPlanningBoard({
           ) : null}
           <div className="flex shrink-0 items-center gap-2">
             <ConflictSummary conflicts={conflicts} />
-            <p className="text-xs font-semibold text-slate-500">
-              Maandag tot zondag
-            </p>
           </div>
         </div>
       </div>
