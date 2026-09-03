@@ -28,7 +28,6 @@ type EmployeeRowProps = {
   onSelectCell: (cell: SelectedPlanningCell) => void;
   onSelectCard: (card: SelectedPlanningCard) => void;
   onDeleteCard: (planningItemId: string) => void;
-  onHideEmployee: (employeeId: string) => void;
   onRemoveEmployeeFromWeek?: (employeeId: string) => void;
   isWeeklyAddedEmployee?: boolean;
 };
@@ -51,7 +50,6 @@ export function EmployeeRow({
   onSelectCell,
   onSelectCard,
   onDeleteCard,
-  onHideEmployee,
   onRemoveEmployeeFromWeek,
   isWeeklyAddedEmployee = false
 }: EmployeeRowProps) {
@@ -59,12 +57,10 @@ export function EmployeeRow({
   const rowTone = rowIndex % 2 === 1 ? "soft" : "plain";
   const employeeCellToneStyle =
     rowTone === "soft" ? "bg-slate-100/95" : "bg-white/95";
-  const employeeActionLabel = isWeeklyAddedEmployee
-    ? `${employeeDisplayName} uit deze week halen`
-    : `${employeeDisplayName} verbergen`;
-  const employeeActionTitle = isWeeklyAddedEmployee
-    ? `${employeeDisplayName} uit deze week halen`
-    : `${employeeDisplayName} verbergen uit planning`;
+  const canRemoveFromWeek =
+    isWeeklyAddedEmployee && Boolean(onRemoveEmployeeFromWeek);
+  const employeeActionLabel = `${employeeDisplayName} uit deze week halen`;
+  const employeeActionTitle = `${employeeDisplayName} uit deze week halen`;
 
   function getCellAvailability(date: string): EmployeeAvailability | undefined {
     return findEmployeeAvailability(employeeAvailability, {
@@ -85,19 +81,17 @@ export function EmployeeRow({
           >
             {employeeDisplayName}
           </span>
-          <button
-            className="absolute right-0 top-1/2 -translate-y-1/2 rounded border border-transparent px-1 py-0.5 text-[10px] font-semibold leading-3 text-slate-400 opacity-0 transition-opacity hover:border-slate-200 hover:bg-white hover:text-slate-600 focus:border-slate-200 focus:bg-white focus:text-slate-600 focus:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
-            aria-label={employeeActionLabel}
-            onClick={() =>
-              isWeeklyAddedEmployee && onRemoveEmployeeFromWeek
-                ? onRemoveEmployeeFromWeek(employee.id)
-                : onHideEmployee(employee.id)
-            }
-            title={employeeActionTitle}
-            type="button"
-          >
-            ×
-          </button>
+          {canRemoveFromWeek ? (
+            <button
+              className="absolute right-0 top-1/2 -translate-y-1/2 rounded border border-transparent px-1 py-0.5 text-[10px] font-semibold leading-3 text-slate-400 opacity-0 transition-opacity hover:border-slate-200 hover:bg-white hover:text-slate-600 focus:border-slate-200 focus:bg-white focus:text-slate-600 focus:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100"
+              aria-label={employeeActionLabel}
+              onClick={() => onRemoveEmployeeFromWeek?.(employee.id)}
+              title={employeeActionTitle}
+              type="button"
+            >
+              ×
+            </button>
+          ) : null}
         </div>
       </div>
       {days.map((day) => (

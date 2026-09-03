@@ -44,7 +44,6 @@ type WeekPlanningBoardProps = {
   onGoToNextWeek: () => void;
   onGoToPreviousWeek: () => void;
   onGoToWeekStartDate: (weekStartDate: string) => void;
-  onHideEmployee: (employeeId: string) => void;
   onRemoveEmployeeFromWeek: (employeeId: string) => void;
   onSetSelectedCellAvailabilityType: (type: AvailabilityType) => void;
   onToggleSelectedCellAvailability: () => void;
@@ -104,7 +103,6 @@ export function WeekPlanningBoard({
   onGoToNextWeek,
   onGoToPreviousWeek,
   onGoToWeekStartDate,
-  onHideEmployee,
   onRemoveEmployeeFromWeek,
   onSetSelectedCellAvailabilityType,
   onToggleSelectedCellAvailability,
@@ -340,7 +338,6 @@ export function WeekPlanningBoard({
                 employeeAvailability={employeeAvailability}
                 items={items}
                 onDeleteCard={onDeleteCard}
-                onHideEmployee={onHideEmployee}
                 onRemoveEmployeeFromWeek={onRemoveEmployeeFromWeek}
                 onSelectCard={onSelectCard}
                 onSelectCell={onSelectCell}

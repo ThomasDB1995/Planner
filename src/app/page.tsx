@@ -25,7 +25,6 @@ import {
   getHiddenEmployees,
   getVisibleEmployeesForWeek,
   getWeeklyAddedEmployees,
-  hideEmployee,
   showEmployee
 } from "@/lib/planning/employees";
 import { withPlanningItemResourceIds } from "@/lib/planning/planning-resources";
@@ -452,13 +451,6 @@ export default function Home() {
     setEditingPlanningItemId((currentItemId) =>
       isPlanningItemForEmployee(currentItemId, employeeId) ? null : currentItemId
     );
-  }
-
-  function hidePlannerEmployee(employeeId: string) {
-    setPlannerEmployees((currentEmployees) =>
-      hideEmployee(currentEmployees, employeeId)
-    );
-    clearPlannerSelectionForEmployee(employeeId);
   }
 
   function showPlannerEmployee(employeeId: string) {
@@ -903,7 +895,6 @@ export default function Home() {
             onGoToNextWeek={goToNextWeek}
             onGoToPreviousWeek={goToPreviousWeek}
             onGoToWeekStartDate={goToWeekStartDate}
-            onHideEmployee={hidePlannerEmployee}
             onMoveSelectedCard={moveSelectedCardToActiveDestination}
             onRemoveEmployeeFromWeek={removeEmployeeFromActiveWeek}
             onSelectCard={selectPlanningCard}
