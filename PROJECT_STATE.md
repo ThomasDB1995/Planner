@@ -1266,6 +1266,14 @@ Supabase-connectievoorbereiding is toegevoegd:
 - Vercel env vars nodig: `NEXT_PUBLIC_SUPABASE_URL` en `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`;
 - geen plannerdata-migratie, persistence, auth, service role key of RLS-schemawijzigingen uitgevoerd.
 
+Basislogin is toegevoegd:
+
+- Supabase Auth e-mail/wachtwoord scherm staat voor de planner;
+- planner-UI rendert pas na actieve Supabase-sessie;
+- uitloggen is beschikbaar via compacte actie rechtsboven;
+- sign-up/registratie is niet ingebouwd;
+- plannerdata blijft voorlopig lokaal/in-memory en is nog niet achter Supabase RLS geplaatst.
+
 Aanbevolen volgende richtingen, alleen na expliciete nieuwe opdracht:
 
 1. Work Card praktijkvalidatie

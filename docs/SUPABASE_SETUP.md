@@ -18,7 +18,6 @@ Nog niet gedaan:
 
 - planningdata migreren;
 - employees/resources naar database schrijven;
-- authenticatie bouwen;
 - RLS-policies ontwerpen;
 - persistence aanzetten;
 - service role key gebruiken.
@@ -68,7 +67,21 @@ Deze helper:
 
 Na succesvolle Vercel deploy:
 
-1. env vars in Vercel invullen;
-2. redeploy uitvoeren;
-3. kleine read-only healthcheck of testquery toevoegen;
-4. daarna pas datamodel/RLS discovery voor plannerdata starten.
+1. maak toegestane gebruikers aan in Supabase Auth;
+2. controleer login op de Vercel deployment;
+3. voeg later pas database-tabellen en RLS-policies voor plannerdata toe.
+
+## Basislogin
+
+De planner gebruikt Supabase Auth met e-mail en wachtwoord.
+
+Gebruikers beheren:
+
+`Supabase -> Authentication -> Users`
+
+Belangrijk:
+
+- registratie/sign-up zit niet in de planner;
+- alleen bestaande Supabase Auth-gebruikers kunnen aanmelden;
+- de plannerdata blijft voorlopig lokaal/in-memory;
+- echte databeveiliging voor plannerdata volgt pas wanneer data achter Supabase-tabellen met RLS staat.

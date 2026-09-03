@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AuthGate } from "@/components/auth/AuthGate";
 import type {
   EmployeeAvailability,
   SelectedPlanningCard,
@@ -412,6 +413,7 @@ export default function Home() {
   }
 
   return (
+    <AuthGate>
     <main className="min-h-screen bg-perceel-soft px-6 py-4">
       <section className="mx-auto max-w-[1500px]">
         <p className="text-xs font-semibold uppercase text-perceel-green">
@@ -622,5 +624,6 @@ export default function Home() {
         </div>
       </section>
     </main>
+    </AuthGate>
   );
 }
