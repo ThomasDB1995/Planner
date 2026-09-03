@@ -1065,34 +1065,9 @@ export default function Home() {
 
   return (
     <AuthGate onSessionChange={handleAuthSessionChange}>
-      <main className="min-h-screen bg-perceel-soft px-3 pb-5 pt-16 sm:px-5 sm:py-4 lg:px-6">
+      <main className="min-h-screen bg-perceel-soft px-3 pb-5 pt-3 sm:px-5 sm:py-4 lg:px-6">
         <section className="mx-auto max-w-[1500px]">
-          <div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
-            <button
-              className={`rounded-md border px-4 py-2.5 text-sm font-bold shadow-sm sm:min-w-[112px] ${
-                !isPlannerEditMode
-                  ? "border-perceel-green bg-perceel-green text-white"
-                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
-              }`}
-              onClick={() => switchPlannerMode(false)}
-              type="button"
-            >
-              Bekijken
-            </button>
-            <button
-              className={`rounded-md border px-4 py-2.5 text-sm font-bold shadow-sm sm:min-w-[112px] ${
-                isPlannerEditMode
-                  ? "border-perceel-green bg-perceel-green text-white"
-                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
-              }`}
-              onClick={() => switchPlannerMode(true)}
-              type="button"
-            >
-              Bewerken
-            </button>
-          </div>
-
-        <div className="mt-2 space-y-3">
+        <div className="space-y-3">
           {planningSaveError ? (
             <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">
               {planningSaveError}
@@ -1280,6 +1255,7 @@ export default function Home() {
             items={visiblePlanningItems}
             isEditingEnabled={isPlannerEditMode}
             canMoveSelectedCard={canMoveSelectedCard}
+            onSetEditingEnabled={switchPlannerMode}
             onDeleteCard={deletePlanningItem}
             onGoToCurrentWeek={goToCurrentWeek}
             onGoToNextWeek={goToNextWeek}

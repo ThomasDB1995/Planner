@@ -173,7 +173,7 @@ export function AuthGate({ children, onSessionChange }: AuthGateProps) {
 
   return (
     <>
-      <div className="fixed left-3 right-3 top-2 z-50 flex justify-end sm:left-auto sm:top-3">
+      <div className="fixed bottom-3 left-3 right-3 z-50 flex justify-end sm:left-auto">
         <div className="flex max-w-full items-center gap-2 rounded-md border border-perceel-line bg-white/95 px-2 py-1 text-xs shadow-sm">
           <span className="max-w-[calc(100vw-150px)] truncate font-semibold text-slate-600 sm:max-w-[180px]">
             {session.user.email}

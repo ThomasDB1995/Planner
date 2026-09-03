@@ -37,6 +37,7 @@ type WeekPlanningBoardProps = {
   selectedCellAvailability?: EmployeeAvailability;
   canMoveSelectedCard: boolean;
   isEditingEnabled?: boolean;
+  onSetEditingEnabled: (isEditingEnabled: boolean) => void;
   onSelectCell: (cell: SelectedPlanningCell) => void;
   onSelectCard: (card: SelectedPlanningCard) => void;
   onDeleteCard: (planningItemId: string) => void;
@@ -97,6 +98,7 @@ export function WeekPlanningBoard({
   selectedCellAvailability,
   canMoveSelectedCard,
   isEditingEnabled = true,
+  onSetEditingEnabled,
   onSelectCell,
   onSelectCard,
   onDeleteCard,
@@ -161,18 +163,18 @@ export function WeekPlanningBoard({
 
   return (
     <section>
-      <div className="mb-3 grid gap-2 lg:grid-cols-[minmax(180px,1fr)_auto_minmax(260px,1fr)] lg:items-start">
+      <div className="mb-2 grid gap-2 rounded-md border border-perceel-line bg-white px-2 py-2 shadow-sm lg:grid-cols-[minmax(210px,1fr)_auto_minmax(300px,1fr)] lg:items-center">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase text-perceel-green">
+          <p className="text-[11px] font-semibold uppercase text-perceel-green">
             Weekplanning
           </p>
-          <h2 className="mt-1 text-lg font-bold leading-6 text-perceel-dark sm:text-xl">
+          <h2 className="text-lg font-bold leading-6 text-perceel-dark sm:text-xl">
             Matrix per werknemer en dag
           </h2>
         </div>
         <div
           aria-label={`Week ${activeWeekNumber} ${activeWeekYear}, ${weekRangeLabel}`}
-          className="flex w-full max-w-none shrink-0 flex-col items-center gap-1 rounded-md border border-perceel-line bg-white px-2 py-1.5 sm:max-w-[520px] lg:w-fit"
+          className="flex w-full max-w-none shrink-0 flex-col items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2 py-1.5 sm:max-w-[520px] lg:w-fit"
         >
           <div className="flex items-center gap-2">
             <button
@@ -260,6 +262,30 @@ export function WeekPlanningBoard({
           ) : null}
         </div>
         <div className="flex min-h-[34px] flex-wrap items-center justify-start gap-2 lg:justify-end">
+          <div className="grid w-full grid-cols-2 gap-1 sm:w-auto">
+            <button
+              className={`rounded-md border px-3 py-2 text-sm font-bold shadow-sm ${
+                !isEditingEnabled
+                  ? "border-perceel-green bg-perceel-green text-white"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
+              }`}
+              onClick={() => onSetEditingEnabled(false)}
+              type="button"
+            >
+              Bekijken
+            </button>
+            <button
+              className={`rounded-md border px-3 py-2 text-sm font-bold shadow-sm ${
+                isEditingEnabled
+                  ? "border-perceel-green bg-perceel-green text-white"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
+              }`}
+              onClick={() => onSetEditingEnabled(true)}
+              type="button"
+            >
+              Bewerken
+            </button>
+          </div>
           {isEditingEnabled && selectedCell ? (
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
               <button
