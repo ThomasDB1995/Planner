@@ -332,7 +332,7 @@ export function WeekPlanningBoard({
         </div>
       </div>
 
-      <div className="snap-x snap-mandatory scroll-pl-[116px] overflow-x-auto overscroll-x-contain rounded-md border border-slate-300 bg-white shadow-sm sm:snap-none sm:scroll-pl-0">
+      <div className="snap-x snap-mandatory scroll-pl-[116px] overflow-x-auto overscroll-x-none rounded-md border border-slate-300 bg-white shadow-sm sm:snap-none sm:scroll-pl-0">
         <WeekHeader days={days} />
         {employees.map((employee, index) => {
           const showCategorySeparator =
@@ -341,10 +341,11 @@ export function WeekPlanningBoard({
           return (
             <div key={employee.id}>
               {showCategorySeparator ? (
-                <div className="min-w-[calc(116px+7*(100vw-152px))] border-b border-slate-300 bg-slate-200/85 px-2 py-1 sm:min-w-[920px] lg:min-w-[1040px]">
-                  <div className="sticky left-0 z-30 w-fit rounded-sm bg-slate-200 pr-2 text-[10px] font-bold uppercase tracking-wide text-slate-600">
+                <div className="grid min-w-[calc(116px+7*(100vw-152px))] grid-cols-[116px_repeat(7,minmax(220px,calc(100vw-152px)))] border-b border-slate-300 bg-slate-200/85 sm:min-w-[920px] sm:grid-cols-[144px_repeat(7,minmax(110px,1fr))] lg:min-w-[1040px] lg:grid-cols-[156px_repeat(7,minmax(126px,1fr))]">
+                  <div className="sticky left-0 z-30 border-r border-slate-300 bg-slate-200 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-600 shadow-[3px_0_0_rgba(148,163,184,0.22)]">
                     {employee.category}
                   </div>
+                  <div className="col-span-7 bg-slate-200/85" />
                 </div>
               ) : null}
               <EmployeeRow

@@ -56,6 +56,8 @@ export function EmployeeRow({
   isWeeklyAddedEmployee = false
 }: EmployeeRowProps) {
   const employeeDisplayName = getEmployeeDisplayName(employee);
+  const employeeFirstName = employee.firstName.trim();
+  const employeeLastName = employee.lastName.trim();
   const rowTone = rowIndex % 2 === 1 ? "soft" : "plain";
   const employeeCellToneStyle =
     rowTone === "soft" ? "bg-slate-100/95" : "bg-white/95";
@@ -77,11 +79,17 @@ export function EmployeeRow({
         className={`sticky left-0 z-30 flex min-h-[72px] items-center border-r border-slate-300 px-1.5 py-1.5 text-[12px] font-semibold text-perceel-dark shadow-[3px_0_0_rgba(148,163,184,0.22)] sm:px-2 sm:text-sm ${employeeCellToneStyle}`}
       >
         <div className="relative min-w-0 w-full pr-5">
-          <span
-            className="block whitespace-normal break-words leading-4"
-            title={employeeDisplayName}
-          >
-            {employeeDisplayName}
+          <span className="block leading-4" title={employeeDisplayName}>
+            {employeeFirstName && employeeLastName ? (
+              <>
+                <span className="block truncate">{employeeFirstName}</span>
+                <span className="block truncate">{employeeLastName}</span>
+              </>
+            ) : (
+              <span className="block whitespace-normal break-words">
+                {employeeDisplayName}
+              </span>
+            )}
           </span>
           {canRemoveFromWeek ? (
             <button
