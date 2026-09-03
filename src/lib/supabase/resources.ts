@@ -29,8 +29,10 @@ function mapResourceRow(row: SupabaseResourceRow): Resource {
   };
 }
 
-export async function fetchPlannerResources(): Promise<Resource[]> {
-  if (cachedResources) {
+export async function fetchPlannerResources(
+  forceRefresh = false
+): Promise<Resource[]> {
+  if (cachedResources && !forceRefresh) {
     return cachedResources;
   }
 

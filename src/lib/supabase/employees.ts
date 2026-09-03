@@ -27,8 +27,10 @@ function mapEmployeeRow(row: SupabaseEmployeeRow): Employee {
   };
 }
 
-export async function fetchPlannerEmployees(): Promise<Employee[]> {
-  if (cachedEmployees) {
+export async function fetchPlannerEmployees(
+  forceRefresh = false
+): Promise<Employee[]> {
+  if (cachedEmployees && !forceRefresh) {
     return cachedEmployees;
   }
 

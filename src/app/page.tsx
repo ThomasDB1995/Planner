@@ -63,6 +63,8 @@ type ResourceLoadState = "idle" | "loading" | "ready" | "error";
 type EmployeeLoadState = "idle" | "loading" | "ready" | "error";
 type PlanningItemsLoadState = "idle" | "loading" | "ready" | "error";
 
+const PULL_REFRESH_TRIGGER_DISTANCE = 72;
+
 function mergePlanningItemsForDates(
   currentItems: PlanningItem[],
   nextItems: PlanningItem[],
@@ -198,10 +200,16 @@ export default function Home() {
     useState<PlanningItemsLoadState>("idle");
   const [planningSaveError, setPlanningSaveError] = useState("");
   const [isPlannerEditMode, setIsPlannerEditMode] = useState(false);
+  const [plannerRefreshNonce, setPlannerRefreshNonce] = useState(0);
+  const [pullRefreshDistance, setPullRefreshDistance] = useState(0);
+  const [isPlannerRefreshing, setIsPlannerRefreshing] = useState(false);
   const planningItemSaveTimeoutsRef = useRef<
     Record<string, ReturnType<typeof setTimeout>>
   >({});
   const pendingPlanningItemSavesRef = useRef<Record<string, PlanningItem>>({});
+  const pullRefreshStartYRef = useRef(0);
+  const pullRefreshDistanceRef = useRef(0);
+  const pullRefreshIsActiveRef = useRef(false);
   const [showHiddenEmployees, setShowHiddenEmployees] = useState(false);
   const [showWeekEmployeePanel, setShowWeekEmployeePanel] = useState(false);
   const [weekEmployeeToAddId, setWeekEmployeeToAddId] = useState("");
@@ -321,6 +329,11 @@ export default function Home() {
                 : "Kies een cel",
             tone: "create" as const
           };
+  const pullRefreshLabel = isPlannerRefreshing
+    ? "Planning vernieuwen..."
+    : pullRefreshDistance >= PULL_REFRESH_TRIGGER_DISTANCE
+      ? "Loslaten om te vernieuwen"
+      : "Trek om te vernieuwen";
 
   const handleAuthSessionChange = useCallback((nextSession: Session | null) => {
     setAuthSession(nextSession);
@@ -337,6 +350,25 @@ export default function Home() {
     }
   }
 
+  const refreshPlannerData = useCallback(() => {
+    if (!hasSupabaseConnection || !authSession) {
+      return;
+    }
+
+    setIsPlannerRefreshing(true);
+    setPlanningSaveError("");
+    setPlannerRefreshNonce((currentNonce) => currentNonce + 1);
+
+    window.setTimeout(() => {
+      setIsPlannerRefreshing(false);
+    }, 900);
+  }, [authSession, hasSupabaseConnection]);
+
+  function setPullRefreshDistanceValue(nextDistance: number) {
+    pullRefreshDistanceRef.current = nextDistance;
+    setPullRefreshDistance(nextDistance);
+  }
+
   useEffect(() => {
     if (!hasSupabaseConnection || !authSession) {
       setResourceLoadState("idle");
@@ -347,7 +379,7 @@ export default function Home() {
 
     setResourceLoadState("loading");
 
-    fetchPlannerResources()
+    fetchPlannerResources(plannerRefreshNonce > 0)
       .then((nextResources) => {
         if (!isMounted) {
           return;
@@ -368,7 +400,7 @@ export default function Home() {
     return () => {
       isMounted = false;
     };
-  }, [authSession, hasSupabaseConnection]);
+  }, [authSession, hasSupabaseConnection, plannerRefreshNonce]);
 
   useEffect(() => {
     if (!hasSupabaseConnection || !authSession) {
@@ -380,7 +412,7 @@ export default function Home() {
 
     setEmployeeLoadState("loading");
 
-    fetchPlannerEmployees()
+    fetchPlannerEmployees(plannerRefreshNonce > 0)
       .then((nextEmployees) => {
         if (!isMounted) {
           return;
@@ -400,7 +432,7 @@ export default function Home() {
     return () => {
       isMounted = false;
     };
-  }, [authSession, hasSupabaseConnection]);
+  }, [authSession, hasSupabaseConnection, plannerRefreshNonce]);
 
   useEffect(() => {
     if (!hasSupabaseConnection || !authSession || days.length === 0) {
@@ -438,7 +470,12 @@ export default function Home() {
     return () => {
       isMounted = false;
     };
-  }, [authSession, currentWeekStartDate, hasSupabaseConnection]);
+  }, [
+    authSession,
+    currentWeekStartDate,
+    hasSupabaseConnection,
+    plannerRefreshNonce
+  ]);
 
   useEffect(() => {
     if (!hasSupabaseConnection || !authSession || days.length === 0) {
@@ -480,7 +517,11 @@ export default function Home() {
     return () => {
       unsubscribe();
     };
-  }, [authSession, currentWeekStartDate, hasSupabaseConnection]);
+  }, [
+    authSession,
+    currentWeekStartDate,
+    hasSupabaseConnection
+  ]);
 
   useEffect(() => {
     if (!hasSupabaseConnection || !authSession || days.length === 0) {
@@ -535,7 +576,12 @@ export default function Home() {
       isMounted = false;
       unsubscribe();
     };
-  }, [authSession, currentWeekStartDate, hasSupabaseConnection]);
+  }, [
+    authSession,
+    currentWeekStartDate,
+    hasSupabaseConnection,
+    plannerRefreshNonce
+  ]);
 
   useEffect(() => {
     if (!hasSupabaseConnection || !authSession) {
@@ -587,7 +633,68 @@ export default function Home() {
       isMounted = false;
       unsubscribe();
     };
-  }, [activeWeekKey, authSession, hasSupabaseConnection]);
+  }, [activeWeekKey, authSession, hasSupabaseConnection, plannerRefreshNonce]);
+
+  useEffect(() => {
+    if (!hasSupabaseConnection || !authSession) {
+      return;
+    }
+
+    function handleTouchStart(event: TouchEvent) {
+      if (window.scrollY > 0 || event.touches.length !== 1) {
+        return;
+      }
+
+      pullRefreshIsActiveRef.current = true;
+      pullRefreshStartYRef.current = event.touches[0].clientY;
+      setPullRefreshDistanceValue(0);
+    }
+
+    function handleTouchMove(event: TouchEvent) {
+      if (!pullRefreshIsActiveRef.current || event.touches.length !== 1) {
+        return;
+      }
+
+      if (window.scrollY > 0) {
+        pullRefreshIsActiveRef.current = false;
+        setPullRefreshDistanceValue(0);
+        return;
+      }
+
+      const nextDistance = event.touches[0].clientY - pullRefreshStartYRef.current;
+
+      if (nextDistance <= 0) {
+        setPullRefreshDistanceValue(0);
+        return;
+      }
+
+      setPullRefreshDistanceValue(Math.min(nextDistance, 96));
+    }
+
+    function handleTouchEnd() {
+      if (
+        pullRefreshIsActiveRef.current &&
+        pullRefreshDistanceRef.current >= PULL_REFRESH_TRIGGER_DISTANCE
+      ) {
+        refreshPlannerData();
+      }
+
+      pullRefreshIsActiveRef.current = false;
+      setPullRefreshDistanceValue(0);
+    }
+
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, [authSession, hasSupabaseConnection, refreshPlannerData]);
 
   useEffect(() => {
     if (!hasSupabaseConnection || !authSession) {
@@ -1066,6 +1173,11 @@ export default function Home() {
   return (
     <AuthGate onSessionChange={handleAuthSessionChange}>
       <main className="min-h-screen bg-perceel-soft px-3 pb-5 pt-3 sm:px-5 sm:py-4 lg:px-6">
+        {pullRefreshDistance > 0 || isPlannerRefreshing ? (
+          <div className="fixed left-1/2 top-2 z-50 -translate-x-1/2 rounded-full border border-emerald-100 bg-white/95 px-3 py-1 text-xs font-semibold text-perceel-green shadow-sm">
+            {pullRefreshLabel}
+          </div>
+        ) : null}
         <section className="mx-auto max-w-[1500px]">
         <div className="space-y-3">
           {planningSaveError ? (
