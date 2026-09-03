@@ -690,7 +690,7 @@ export default function Home() {
       <main className="min-h-screen bg-perceel-soft px-3 pb-5 pt-16 sm:px-5 sm:py-4 lg:px-6">
         <section className="mx-auto max-w-[1500px]">
           <header className="rounded-md border border-perceel-line bg-white/90 px-3 py-3 shadow-sm sm:px-4">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase text-perceel-green">
                   Perceel
@@ -703,15 +703,17 @@ export default function Home() {
                   optioneel materieel en conflictwaarschuwingen.
                 </p>
               </div>
-              <p className="w-fit rounded border border-emerald-100 bg-emerald-50 px-2 py-1 text-xs font-semibold text-slate-600">
-                Datalaag: {resourceStatusLabel}
-              </p>
-              <p className="w-fit rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-600">
-                Werknemers: {employeeStatusLabel}
-              </p>
-              <p className="w-fit rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-600">
-                Planning: {planningStatusLabel}
-              </p>
+              <div className="flex max-w-full flex-wrap gap-1.5 lg:max-w-[560px] lg:justify-end">
+                <p className="max-w-full rounded border border-emerald-100 bg-emerald-50 px-2 py-1 text-xs font-semibold text-slate-600">
+                  Datalaag: {resourceStatusLabel}
+                </p>
+                <p className="max-w-full rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-600">
+                  Werknemers: {employeeStatusLabel}
+                </p>
+                <p className="max-w-full rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-600">
+                  Planning: {planningStatusLabel}
+                </p>
+              </div>
             </div>
           </header>
 
