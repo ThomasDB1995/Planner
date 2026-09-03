@@ -49,8 +49,8 @@ export function PlanningCard({
 
   return (
     <article
-      className={`relative border-l-4 border-slate-300 bg-white px-1.5 py-0.5 text-xs leading-4 text-slate-700 ${
-        auditInitial ? "pb-3 pr-6" : ""
+      className={`relative border-l-4 border-slate-300 bg-white px-1.5 py-0.5 pr-6 text-xs leading-4 text-slate-700 ${
+        auditInitial ? "pb-3" : ""
       } ${selectedStyle}`}
       data-selected={isSelected ? "true" : "false"}
       onClick={(event) => {
@@ -58,24 +58,20 @@ export function PlanningCard({
         onSelect();
       }}
     >
-      <div className="flex items-start justify-between gap-2">
-        <p className="truncate font-semibold text-slate-950" title={item.taskName}>
-          {item.taskName}
-        </p>
-        <div className="flex shrink-0 items-start gap-1">
-          <button
-            aria-label={`Verwijder ${item.taskName}`}
-            className="rounded border border-transparent px-1 text-[11px] font-bold leading-3 text-slate-500 hover:border-slate-300 hover:bg-white hover:text-red-700"
-            onClick={(event) => {
-              event.stopPropagation();
-              onDelete();
-            }}
-            type="button"
-          >
-            x
-          </button>
-        </div>
-      </div>
+      <p className="truncate font-semibold text-slate-950" title={item.taskName}>
+        {item.taskName}
+      </p>
+      <button
+        aria-label={`Verwijder ${item.taskName}`}
+        className="absolute right-1 top-0.5 rounded border border-transparent px-1 text-[11px] font-bold leading-3 text-slate-500 hover:border-slate-300 hover:bg-white hover:text-red-700"
+        onClick={(event) => {
+          event.stopPropagation();
+          onDelete();
+        }}
+        type="button"
+      >
+        x
+      </button>
       {resources.length > 0 ? (
         <div
           className="mt-0.5 flex min-w-0 flex-wrap gap-1"
