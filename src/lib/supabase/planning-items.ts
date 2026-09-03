@@ -2,6 +2,10 @@ import {
   getPlanningItemResourceIds,
   withPlanningItemResourceIds
 } from "@/lib/planning/planning-resources";
+import {
+  getPlannerAuditEmail,
+  type PlannerAuditUser
+} from "@/lib/supabase/audit";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { PlanningItem, PlanningStatus } from "@/types/planning";
 
@@ -13,10 +17,20 @@ type SupabasePlanningItemRow = {
   resource_id: string | null;
   resource_ids: string[] | null;
   status: PlanningStatus | string | null;
+  created_by: string | null;
+  updated_by: string | null;
+  created_by_email: string | null;
+  updated_by_email: string | null;
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 const planningItemSelect =
-  "id, date, employee_id, task_name, resource_id, resource_ids, status";
+  "id, date, employee_id, task_name, resource_id, resource_ids, status, created_by, updated_by, created_by_email, updated_by_email, created_at, updated_at";
+
+type PlanningItemChange =
+  | { eventType: "DELETE"; itemId: string; date?: string }
+  | { eventType: "INSERT" | "UPDATE"; item: PlanningItem };
 
 function normalizePlanningStatus(
   status: PlanningStatus | string | null
@@ -39,14 +53,21 @@ function mapPlanningItemRow(row: SupabasePlanningItemRow): PlanningItem {
       date: row.date,
       employeeId: row.employee_id,
       taskName: row.task_name,
-      status: normalizePlanningStatus(row.status)
+      status: normalizePlanningStatus(row.status),
+      createdBy: row.created_by ?? undefined,
+      updatedBy: row.updated_by ?? undefined,
+      createdByEmail: row.created_by_email ?? undefined,
+      updatedByEmail: row.updated_by_email ?? undefined,
+      createdAt: row.created_at ?? undefined,
+      updatedAt: row.updated_at ?? undefined
     },
     row.resource_ids ?? (row.resource_id ? [row.resource_id] : [])
   );
 }
 
-function toPlanningItemRow(item: PlanningItem) {
+function toPlanningItemRow(item: PlanningItem, user?: PlannerAuditUser) {
   const resourceIds = getPlanningItemResourceIds(item);
+  const email = user ? getPlannerAuditEmail(user) : null;
 
   return {
     id: item.id,
@@ -55,7 +76,18 @@ function toPlanningItemRow(item: PlanningItem) {
     task_name: item.taskName,
     resource_id: resourceIds[0] ?? null,
     resource_ids: resourceIds,
-    status: item.status
+    status: item.status,
+    updated_by: user?.id ?? item.updatedBy ?? null,
+    updated_by_email: email ?? item.updatedByEmail ?? null
+  };
+}
+
+function toNewPlanningItemRow(item: PlanningItem, user?: PlannerAuditUser) {
+  return {
+    ...toPlanningItemRow(item, user),
+    created_by: user?.id ?? item.createdBy ?? null,
+    created_by_email:
+      (user ? getPlannerAuditEmail(user) : null) ?? item.createdByEmail ?? null
   };
 }
 
@@ -87,7 +119,8 @@ export async function fetchPlannerPlanningItemsForDateRange(
 }
 
 export async function createPlannerPlanningItem(
-  item: PlanningItem
+  item: PlanningItem,
+  user?: PlannerAuditUser
 ): Promise<PlanningItem> {
   const supabase = getSupabaseBrowserClient();
 
@@ -97,7 +130,7 @@ export async function createPlannerPlanningItem(
 
   const { data, error } = await supabase
     .from("planning_items")
-    .insert(toPlanningItemRow(item))
+    .insert(toNewPlanningItemRow(item, user))
     .select(planningItemSelect)
     .single();
 
@@ -109,7 +142,8 @@ export async function createPlannerPlanningItem(
 }
 
 export async function updatePlannerPlanningItem(
-  item: PlanningItem
+  item: PlanningItem,
+  user?: PlannerAuditUser
 ): Promise<PlanningItem> {
   const supabase = getSupabaseBrowserClient();
 
@@ -119,7 +153,7 @@ export async function updatePlannerPlanningItem(
 
   const { data, error } = await supabase
     .from("planning_items")
-    .update(toPlanningItemRow(item))
+    .update(toPlanningItemRow(item, user))
     .eq("id", item.id)
     .select(planningItemSelect)
     .single();
@@ -143,4 +177,52 @@ export async function deletePlannerPlanningItem(id: string): Promise<void> {
   if (error) {
     throw error;
   }
+}
+
+export function subscribePlannerPlanningItems(
+  onChange: (change: PlanningItemChange) => void
+): () => void {
+  const supabase = getSupabaseBrowserClient();
+
+  if (!supabase) {
+    return () => {};
+  }
+
+  const channel = supabase
+    .channel("planner-planning-items")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "planning_items" },
+      (payload) => {
+        if (payload.eventType === "DELETE") {
+          const oldRow = payload.old as Partial<SupabasePlanningItemRow>;
+
+          if (oldRow.id) {
+            onChange({
+              eventType: "DELETE",
+              itemId: oldRow.id,
+              date: oldRow.date
+            });
+          }
+
+          return;
+        }
+
+        const row = payload.new as SupabasePlanningItemRow | null;
+
+        if (!row?.id) {
+          return;
+        }
+
+        onChange({
+          eventType: payload.eventType as "INSERT" | "UPDATE",
+          item: mapPlanningItemRow(row)
+        });
+      }
+    )
+    .subscribe();
+
+  return () => {
+    void supabase.removeChannel(channel);
+  };
 }

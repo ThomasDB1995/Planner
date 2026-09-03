@@ -8,6 +8,7 @@ import {
   getPlanningItemResourceIds,
   withPlanningItemResourceIds
 } from "@/lib/planning/planning-resources";
+import type { PlannerAuditUser } from "@/lib/supabase/audit";
 import type { Employee, PlanningItem, Resource } from "@/types/planning";
 
 type PlanningFormProps = {
@@ -15,6 +16,7 @@ type PlanningFormProps = {
   resources: Resource[];
   resourcesAreLoading?: boolean;
   resourcesLoadError?: boolean;
+  auditUser?: PlannerAuditUser;
   editingItem?: PlanningItem;
   actionContext: {
     label: string;
@@ -24,8 +26,10 @@ type PlanningFormProps = {
   onCreate: (item: Omit<PlanningItem, "id">) => void;
   onEditChange: (
     planningItemId: string,
-    updates: Partial<Pick<PlanningItem, "taskName" | "resourceIds">>
+    updates: Partial<Pick<PlanningItem, "taskName" | "resourceIds">>,
+    debounce?: boolean
   ) => void;
+  onFlushPendingEdits?: () => void;
   selectedCell: SelectedPlanningCell | null;
 };
 
@@ -48,10 +52,12 @@ export function PlanningForm({
   resources,
   resourcesAreLoading = false,
   resourcesLoadError = false,
+  auditUser,
   editingItem,
   actionContext,
   onCreate,
   onEditChange,
+  onFlushPendingEdits,
   selectedCell
 }: PlanningFormProps) {
   const [formState, setFormState] = useState<PlanningFormState>(initialFormState);
@@ -135,7 +141,7 @@ export function PlanningForm({
       return;
     }
 
-    onEditChange(editingItem.id, { resourceIds });
+    onEditChange(editingItem.id, { resourceIds }, false);
   }
 
   function submitPlanningItem(event: React.FormEvent<HTMLFormElement>) {
@@ -250,6 +256,7 @@ export function PlanningForm({
           Taak/project
           <input
             className="mt-1 h-9 w-full rounded-md border border-perceel-line px-2 py-1 text-sm xl:h-auto"
+            onBlur={onFlushPendingEdits}
             onChange={(event) => updateField("taskName", event.target.value)}
             onKeyDown={(event) => {
               if (event.key !== "Enter") {
@@ -297,6 +304,7 @@ export function PlanningForm({
           resources={resources}
           isLoading={resourcesAreLoading}
           hasLoadError={resourcesLoadError}
+          auditUser={auditUser}
           selectedResourceIds={formState.resourceIds}
         />
         {!isEditMode ? (

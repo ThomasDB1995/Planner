@@ -38,6 +38,12 @@ export type PlanningItem = {
   resourceId?: string;
   resourceIds?: string[];
   status: PlanningStatus;
+  createdBy?: string;
+  createdByEmail?: string;
+  updatedBy?: string;
+  updatedByEmail?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type WorkCardTerrain = {

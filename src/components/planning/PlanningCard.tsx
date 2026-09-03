@@ -33,6 +33,17 @@ export function PlanningCard({
   const resourceTitle = resources
     .map((resource) => getResourceDisplayLabel(resource))
     .join("\n");
+  const auditLabel = item.updatedByEmail
+    ? `Gewijzigd: ${item.updatedByEmail}`
+    : item.createdByEmail
+      ? `Aangemaakt: ${item.createdByEmail}`
+      : "";
+  const auditTitle = [
+    item.createdByEmail ? `Aangemaakt door ${item.createdByEmail}` : "",
+    item.updatedByEmail ? `Gewijzigd door ${item.updatedByEmail}` : ""
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   return (
     <article
@@ -93,6 +104,14 @@ export function PlanningCard({
             </span>
           ))}
         </div>
+      ) : null}
+      {auditLabel ? (
+        <p
+          className="mt-0.5 truncate text-[10px] font-medium leading-3 text-slate-400"
+          title={auditTitle}
+        >
+          {auditLabel}
+        </p>
       ) : null}
     </article>
   );

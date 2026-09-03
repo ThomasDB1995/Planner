@@ -11,6 +11,13 @@ import {
   type ResourceCategoryFilter,
   type ResourceTypeFilter
 } from "@/lib/planning/resources";
+import type { PlannerAuditUser } from "@/lib/supabase/audit";
+import {
+  addPlannerResourceFavorite,
+  fetchPlannerResourceFavoriteIds,
+  removePlannerResourceFavorite,
+  subscribePlannerResourceFavorites
+} from "@/lib/supabase/resource-favorites";
 import type { Resource } from "@/types/planning";
 
 type ResourceSelectorProps = {
@@ -18,6 +25,7 @@ type ResourceSelectorProps = {
   selectedResourceIds: string[];
   isLoading?: boolean;
   hasLoadError?: boolean;
+  auditUser?: PlannerAuditUser;
   onChange: (resourceIds: string[]) => void;
 };
 
@@ -30,6 +38,7 @@ export function ResourceSelector({
   selectedResourceIds,
   isLoading = false,
   hasLoadError = false,
+  auditUser,
   onChange
 }: ResourceSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,6 +51,7 @@ export function ResourceSelector({
         .filter((resource) => resource.isFavorite)
         .map((resource) => resource.id)
   );
+  const [favoriteSaveError, setFavoriteSaveError] = useState("");
 
   const categories = useMemo(() => getResourceCategories(resources), [resources]);
   const types = useMemo(() => getResourceTypes(resources), [resources]);
@@ -81,12 +91,60 @@ export function ResourceSelector({
   const selectorIsUnavailable = isLoading || hasLoadError;
 
   useEffect(() => {
-    setFavoriteResourceIds(
-      resources
-        .filter((resource) => resource.isFavorite)
-        .map((resource) => resource.id)
+    const seededFavoriteIds = resources
+      .filter((resource) => resource.isFavorite)
+      .map((resource) => resource.id);
+
+    setFavoriteResourceIds((currentFavoriteResourceIds) =>
+      currentFavoriteResourceIds.length > 0
+        ? currentFavoriteResourceIds
+        : seededFavoriteIds
     );
   }, [resources]);
+
+  useEffect(() => {
+    if (!auditUser) {
+      return;
+    }
+
+    let isMounted = true;
+
+    fetchPlannerResourceFavoriteIds()
+      .then((nextFavoriteResourceIds) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setFavoriteResourceIds(nextFavoriteResourceIds);
+        setFavoriteSaveError("");
+      })
+      .catch(() => {
+        if (isMounted) {
+          setFavoriteSaveError("Favorieten niet geladen.");
+        }
+      });
+
+    const unsubscribe = subscribePlannerResourceFavorites((change) => {
+      setFavoriteResourceIds((currentFavoriteResourceIds) => {
+        if (change.eventType === "DELETE") {
+          return currentFavoriteResourceIds.filter(
+            (resourceId) => resourceId !== change.resourceId
+          );
+        }
+
+        if (currentFavoriteResourceIds.includes(change.resourceId)) {
+          return currentFavoriteResourceIds;
+        }
+
+        return [...currentFavoriteResourceIds, change.resourceId];
+      });
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, [auditUser?.email, auditUser?.id]);
 
   function toggleResource(resourceId: string) {
     if (selectedResourceIdSet.has(resourceId)) {
@@ -106,9 +164,27 @@ export function ResourceSelector({
   }
 
   function toggleResourceFavorite(resourceId: string) {
+    const wasFavorite = favoriteResourceIds.includes(resourceId);
+
     setFavoriteResourceIds((currentFavoriteResourceIds) =>
       toggleFavorite(currentFavoriteResourceIds, resourceId)
     );
+    setFavoriteSaveError("");
+
+    if (!auditUser) {
+      return;
+    }
+
+    const saveFavorite = wasFavorite
+      ? removePlannerResourceFavorite(resourceId)
+      : addPlannerResourceFavorite(resourceId, auditUser);
+
+    saveFavorite.catch(() => {
+      setFavoriteResourceIds((currentFavoriteResourceIds) =>
+        toggleFavorite(currentFavoriteResourceIds, resourceId)
+      );
+      setFavoriteSaveError("Favoriet niet opgeslagen.");
+    });
   }
 
   return (
@@ -186,6 +262,11 @@ export function ResourceSelector({
               Klaar
             </button>
           </div>
+          {favoriteSaveError ? (
+            <p className="mt-1 text-[11px] font-semibold text-red-700">
+              {favoriteSaveError}
+            </p>
+          ) : null}
 
           <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-[minmax(160px,1fr)_120px_140px]">
             <label className="text-[10px] font-semibold uppercase text-slate-600">

@@ -40,9 +40,23 @@ import {
   createPlannerPlanningItem,
   deletePlannerPlanningItem,
   fetchPlannerPlanningItemsForDateRange,
+  subscribePlannerPlanningItems,
   updatePlannerPlanningItem
 } from "@/lib/supabase/planning-items";
 import { fetchPlannerResources } from "@/lib/supabase/resources";
+import {
+  deletePlannerAvailability,
+  fetchPlannerAvailabilityForDateRange,
+  subscribePlannerAvailability,
+  upsertPlannerAvailability
+} from "@/lib/supabase/availability";
+import type { PlannerAuditUser } from "@/lib/supabase/audit";
+import {
+  addPlannerWeeklyEmployee,
+  fetchPlannerWeeklyEmployeeIds,
+  removePlannerWeeklyEmployee,
+  subscribePlannerWeeklyEmployees
+} from "@/lib/supabase/weekly-employees";
 import type { PlanningItem, Resource } from "@/types/planning";
 
 type ResourceLoadState = "idle" | "loading" | "ready" | "error";
@@ -60,6 +74,108 @@ function mergePlanningItemsForDates(
     ...currentItems.filter((item) => !dateSet.has(item.date)),
     ...nextItems
   ];
+}
+
+function mergeEmployeeAvailabilityForDates(
+  currentAvailability: EmployeeAvailability[],
+  nextAvailability: EmployeeAvailability[],
+  dates: string[]
+): EmployeeAvailability[] {
+  const dateSet = new Set(dates);
+
+  return [
+    ...currentAvailability.filter(
+      (availability) => !dateSet.has(availability.date)
+    ),
+    ...nextAvailability
+  ];
+}
+
+function upsertEmployeeAvailabilityInState(
+  currentAvailability: EmployeeAvailability[],
+  nextAvailability: EmployeeAvailability
+): EmployeeAvailability[] {
+  const availabilityKey = `${nextAvailability.employeeId}:${nextAvailability.date}`;
+  const hasExistingAvailability = currentAvailability.some(
+    (availability) =>
+      `${availability.employeeId}:${availability.date}` === availabilityKey
+  );
+
+  if (!hasExistingAvailability) {
+    return [...currentAvailability, nextAvailability];
+  }
+
+  return currentAvailability.map((availability) =>
+    `${availability.employeeId}:${availability.date}` === availabilityKey
+      ? nextAvailability
+      : availability
+  );
+}
+
+function removeEmployeeAvailabilityFromState(
+  currentAvailability: EmployeeAvailability[],
+  targetAvailability: EmployeeAvailability
+): EmployeeAvailability[] {
+  const availabilityKey = `${targetAvailability.employeeId}:${targetAvailability.date}`;
+
+  return currentAvailability.filter(
+    (availability) =>
+      `${availability.employeeId}:${availability.date}` !== availabilityKey
+  );
+}
+
+function setWeeklyEmployeeIdsForWeek(
+  currentEmployeesByWeek: Record<string, string[]>,
+  weekKey: string,
+  employeeIds: string[]
+): Record<string, string[]> {
+  const nextEmployeesByWeek = { ...currentEmployeesByWeek };
+
+  if (employeeIds.length === 0) {
+    delete nextEmployeesByWeek[weekKey];
+    return nextEmployeesByWeek;
+  }
+
+  nextEmployeesByWeek[weekKey] = employeeIds;
+  return nextEmployeesByWeek;
+}
+
+function addWeeklyEmployeeIdInState(
+  currentEmployeesByWeek: Record<string, string[]>,
+  weekKey: string,
+  employeeId: string
+): Record<string, string[]> {
+  const currentEmployeeIds = currentEmployeesByWeek[weekKey] ?? [];
+
+  if (currentEmployeeIds.includes(employeeId)) {
+    return currentEmployeesByWeek;
+  }
+
+  return setWeeklyEmployeeIdsForWeek(currentEmployeesByWeek, weekKey, [
+    ...currentEmployeeIds,
+    employeeId
+  ]);
+}
+
+function removeWeeklyEmployeeIdInState(
+  currentEmployeesByWeek: Record<string, string[]>,
+  weekKey: string,
+  employeeId: string
+): Record<string, string[]> {
+  const currentEmployeeIds = currentEmployeesByWeek[weekKey] ?? [];
+  const nextEmployeeIds = currentEmployeeIds.filter(
+    (currentEmployeeId) => currentEmployeeId !== employeeId
+  );
+
+  if (nextEmployeeIds.length === currentEmployeeIds.length) {
+    return currentEmployeesByWeek;
+  }
+
+  return setWeeklyEmployeeIdsForWeek(
+    currentEmployeesByWeek,
+    weekKey,
+    nextEmployeeIds
+  );
 }
 
 function createPlanningItemId(): string {
@@ -84,6 +200,7 @@ export default function Home() {
   const planningItemSaveTimeoutsRef = useRef<
     Record<string, ReturnType<typeof setTimeout>>
   >({});
+  const pendingPlanningItemSavesRef = useRef<Record<string, PlanningItem>>({});
   const [showHiddenEmployees, setShowHiddenEmployees] = useState(false);
   const [showWeekEmployeePanel, setShowWeekEmployeePanel] = useState(false);
   const [weekEmployeeToAddId, setWeekEmployeeToAddId] = useState("");
@@ -109,6 +226,12 @@ export default function Home() {
   >([]);
   const days = getWorkWeek(currentWeekStartDate);
   const hasSupabaseConnection = isSupabaseConfigured();
+  const auditUser: PlannerAuditUser | undefined = authSession
+    ? {
+        id: authSession.user.id,
+        email: authSession.user.email
+      }
+    : undefined;
   const resourceStatusLabel =
     resourceLoadState === "ready"
       ? `Supabase · ${resources.length} materieelitems`
@@ -334,15 +457,202 @@ export default function Home() {
   }, [authSession, currentWeekStartDate, hasSupabaseConnection]);
 
   useEffect(() => {
-    const pendingTimeouts = planningItemSaveTimeoutsRef.current;
+    if (!hasSupabaseConnection || !authSession || days.length === 0) {
+      return;
+    }
+
+    const visibleDateSet = new Set(days.map((day) => day.date));
+    const unsubscribe = subscribePlannerPlanningItems((change) => {
+      if (change.eventType === "DELETE") {
+        setPlanningItems((currentItems) =>
+          currentItems.filter((item) => item.id !== change.itemId)
+        );
+        return;
+      }
+
+      if (pendingPlanningItemSavesRef.current[change.item.id]) {
+        return;
+      }
+
+      setPlanningItems((currentItems) => {
+        const hasExistingItem = currentItems.some(
+          (item) => item.id === change.item.id
+        );
+
+        if (!visibleDateSet.has(change.item.date)) {
+          return currentItems.filter((item) => item.id !== change.item.id);
+        }
+
+        if (!hasExistingItem) {
+          return [...currentItems, change.item];
+        }
+
+        return currentItems.map((item) =>
+          item.id === change.item.id ? change.item : item
+        );
+      });
+    });
 
     return () => {
-      Object.values(pendingTimeouts).forEach(clearTimeout);
+      unsubscribe();
     };
-  }, []);
+  }, [authSession, currentWeekStartDate, hasSupabaseConnection]);
+
+  useEffect(() => {
+    if (!hasSupabaseConnection || !authSession || days.length === 0) {
+      return;
+    }
+
+    let isMounted = true;
+    const startDate = days[0].date;
+    const endDate = days[days.length - 1].date;
+    const weekDates = days.map((day) => day.date);
+    const visibleDateSet = new Set(weekDates);
+
+    fetchPlannerAvailabilityForDateRange(startDate, endDate)
+      .then((nextAvailability) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setEmployeeAvailability((currentAvailability) =>
+          mergeEmployeeAvailabilityForDates(
+            currentAvailability,
+            nextAvailability,
+            weekDates
+          )
+        );
+      })
+      .catch(() => {
+        if (isMounted) {
+          setPlanningSaveError("Availability niet geladen uit Supabase.");
+        }
+      });
+
+    const unsubscribe = subscribePlannerAvailability((change) => {
+      if (!visibleDateSet.has(change.availability.date)) {
+        return;
+      }
+
+      setEmployeeAvailability((currentAvailability) =>
+        change.eventType === "DELETE"
+          ? removeEmployeeAvailabilityFromState(
+              currentAvailability,
+              change.availability
+            )
+          : upsertEmployeeAvailabilityInState(
+              currentAvailability,
+              change.availability
+            )
+      );
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, [authSession, currentWeekStartDate, hasSupabaseConnection]);
+
+  useEffect(() => {
+    if (!hasSupabaseConnection || !authSession) {
+      return;
+    }
+
+    let isMounted = true;
+    const weekKey = activeWeekKey;
+
+    fetchPlannerWeeklyEmployeeIds(weekKey)
+      .then((employeeIds) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setWeeklyEmployeeIdsByWeek((currentEmployeesByWeek) =>
+          setWeeklyEmployeeIdsForWeek(
+            currentEmployeesByWeek,
+            weekKey,
+            employeeIds
+          )
+        );
+      })
+      .catch(() => {
+        if (isMounted) {
+          setPlanningSaveError(
+            "Weekgebonden werknemers niet geladen uit Supabase."
+          );
+        }
+      });
+
+    const unsubscribe = subscribePlannerWeeklyEmployees((change) => {
+      setWeeklyEmployeeIdsByWeek((currentEmployeesByWeek) =>
+        change.eventType === "DELETE"
+          ? removeWeeklyEmployeeIdInState(
+              currentEmployeesByWeek,
+              change.weekKey,
+              change.employeeId
+            )
+          : addWeeklyEmployeeIdInState(
+              currentEmployeesByWeek,
+              change.weekKey,
+              change.employeeId
+            )
+      );
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, [activeWeekKey, authSession, hasSupabaseConnection]);
+
+  useEffect(() => {
+    if (!hasSupabaseConnection || !authSession) {
+      return;
+    }
+
+    function flushWhenLeavingPage() {
+      flushPendingPlanningItemSaves();
+    }
+
+    function flushWhenHidden() {
+      if (document.visibilityState === "hidden") {
+        flushPendingPlanningItemSaves();
+      }
+    }
+
+    window.addEventListener("pagehide", flushWhenLeavingPage);
+    document.addEventListener("visibilitychange", flushWhenHidden);
+
+    return () => {
+      flushPendingPlanningItemSaves();
+      window.removeEventListener("pagehide", flushWhenLeavingPage);
+      document.removeEventListener("visibilitychange", flushWhenHidden);
+    };
+  }, [authSession, hasSupabaseConnection]);
 
   function shouldPersistPlanningItems(): boolean {
     return hasSupabaseConnection && Boolean(authSession);
+  }
+
+  function savePlanningItemNow(item: PlanningItem) {
+    if (!auditUser) {
+      return;
+    }
+
+    updatePlannerPlanningItem(item, auditUser)
+      .then((savedItem) => {
+        setPlanningItems((currentItems) =>
+          currentItems.map((currentItem) =>
+            currentItem.id === savedItem.id ? savedItem : currentItem
+          )
+        );
+        setPlanningSaveError("");
+      })
+      .catch(() => {
+        setPlanningSaveError(
+          "Planningwijziging niet opgeslagen. Herlaad niet voor je dit controleert."
+        );
+      });
   }
 
   function persistPlanningItemUpdate(item: PlanningItem, debounce = true) {
@@ -350,23 +660,19 @@ export default function Home() {
       return;
     }
 
-    const persist = () => {
-      delete planningItemSaveTimeoutsRef.current[item.id];
+    pendingPlanningItemSavesRef.current[item.id] = item;
 
-      updatePlannerPlanningItem(item)
-        .then((savedItem) => {
-          setPlanningItems((currentItems) =>
-            currentItems.map((currentItem) =>
-              currentItem.id === savedItem.id ? savedItem : currentItem
-            )
-          );
-          setPlanningSaveError("");
-        })
-        .catch(() => {
-          setPlanningSaveError(
-            "Planningwijziging niet opgeslagen. Herlaad niet voor je dit controleert."
-          );
-        });
+    const persist = () => {
+      const pendingItem = pendingPlanningItemSavesRef.current[item.id];
+
+      if (!pendingItem) {
+        return;
+      }
+
+      delete planningItemSaveTimeoutsRef.current[item.id];
+      delete pendingPlanningItemSavesRef.current[item.id];
+
+      savePlanningItemNow(pendingItem);
     };
 
     clearTimeout(planningItemSaveTimeoutsRef.current[item.id]);
@@ -379,10 +685,23 @@ export default function Home() {
     planningItemSaveTimeoutsRef.current[item.id] = setTimeout(persist, 500);
   }
 
+  function flushPendingPlanningItemSaves() {
+    Object.values(pendingPlanningItemSavesRef.current).forEach((item) => {
+      clearTimeout(planningItemSaveTimeoutsRef.current[item.id]);
+      delete planningItemSaveTimeoutsRef.current[item.id];
+      delete pendingPlanningItemSavesRef.current[item.id];
+      savePlanningItemNow(item);
+    });
+  }
+
   async function addPlanningItem(item: Omit<PlanningItem, "id">) {
     const nextItem = {
       ...item,
-      id: createPlanningItemId()
+      id: createPlanningItemId(),
+      createdBy: auditUser?.id,
+      createdByEmail: auditUser?.email ?? undefined,
+      updatedBy: auditUser?.id,
+      updatedByEmail: auditUser?.email ?? undefined
     };
 
     setPlanningItems((currentItems) => [...currentItems, nextItem]);
@@ -393,7 +712,7 @@ export default function Home() {
     }
 
     try {
-      const savedItem = await createPlannerPlanningItem(nextItem);
+      const savedItem = await createPlannerPlanningItem(nextItem, auditUser);
 
       setPlanningItems((currentItems) =>
         currentItems.map((currentItem) =>
@@ -464,45 +783,61 @@ export default function Home() {
       return;
     }
 
+    const weekKey = activeWeekKey;
+
     setWeeklyEmployeeIdsByWeek((currentEmployeesByWeek) => {
-      const currentWeekEmployeeIds =
-        currentEmployeesByWeek[activeWeekKey] ?? [];
-
-      if (currentWeekEmployeeIds.includes(employeeId)) {
-        return currentEmployeesByWeek;
-      }
-
-      return {
-        ...currentEmployeesByWeek,
-        [activeWeekKey]: [...currentWeekEmployeeIds, employeeId]
-      };
+      return addWeeklyEmployeeIdInState(
+        currentEmployeesByWeek,
+        weekKey,
+        employeeId
+      );
     });
     setWeekEmployeeToAddId("");
+    setPlanningSaveError("");
+
+    if (!shouldPersistPlanningItems() || !auditUser) {
+      return;
+    }
+
+    addPlannerWeeklyEmployee(weekKey, employeeId, auditUser).catch(() => {
+      setWeeklyEmployeeIdsByWeek((currentEmployeesByWeek) =>
+        removeWeeklyEmployeeIdInState(
+          currentEmployeesByWeek,
+          weekKey,
+          employeeId
+        )
+      );
+      setPlanningSaveError(
+        "Werknemer niet toegevoegd aan deze week in Supabase."
+      );
+    });
   }
 
   function removeEmployeeFromActiveWeek(employeeId: string) {
-    setWeeklyEmployeeIdsByWeek((currentEmployeesByWeek) => {
-      const currentWeekEmployeeIds =
-        currentEmployeesByWeek[activeWeekKey] ?? [];
-      const nextWeekEmployeeIds = currentWeekEmployeeIds.filter(
-        (currentEmployeeId) => currentEmployeeId !== employeeId
-      );
+    const weekKey = activeWeekKey;
 
-      if (nextWeekEmployeeIds.length === currentWeekEmployeeIds.length) {
-        return currentEmployeesByWeek;
-      }
-
-      const nextEmployeesByWeek = { ...currentEmployeesByWeek };
-
-      if (nextWeekEmployeeIds.length === 0) {
-        delete nextEmployeesByWeek[activeWeekKey];
-        return nextEmployeesByWeek;
-      }
-
-      nextEmployeesByWeek[activeWeekKey] = nextWeekEmployeeIds;
-      return nextEmployeesByWeek;
-    });
+    setWeeklyEmployeeIdsByWeek((currentEmployeesByWeek) =>
+      removeWeeklyEmployeeIdInState(currentEmployeesByWeek, weekKey, employeeId)
+    );
     clearPlannerSelectionForEmployee(employeeId);
+    setPlanningSaveError("");
+
+    if (!shouldPersistPlanningItems()) {
+      return;
+    }
+
+    removePlannerWeeklyEmployee(weekKey, employeeId).catch(() => {
+      setWeeklyEmployeeIdsByWeek((currentEmployeesByWeek) =>
+        addWeeklyEmployeeIdInState(
+          currentEmployeesByWeek,
+          weekKey,
+          employeeId
+        )
+      );
+      setPlanningSaveError(
+        "Werknemer niet uit deze week verwijderd in Supabase."
+      );
+    });
   }
 
   function goToCurrentWeek() {
@@ -531,7 +866,8 @@ export default function Home() {
 
   function updatePlanningItem(
     planningItemId: string,
-    updates: Partial<Pick<PlanningItem, "taskName" | "resourceIds">>
+    updates: Partial<Pick<PlanningItem, "taskName" | "resourceIds">>,
+    debounce = true
   ) {
     const currentItem = planningItems.find((item) => item.id === planningItemId);
 
@@ -553,7 +889,7 @@ export default function Home() {
         item.id === planningItemId ? updatedItem : item
       )
     );
-    persistPlanningItemUpdate(updatedItem);
+    persistPlanningItemUpdate(updatedItem, debounce);
   }
 
   async function deletePlanningItem(planningItemId: string) {
@@ -561,6 +897,7 @@ export default function Home() {
 
     clearTimeout(planningItemSaveTimeoutsRef.current[planningItemId]);
     delete planningItemSaveTimeoutsRef.current[planningItemId];
+    delete pendingPlanningItemSavesRef.current[planningItemId];
 
     setPlanningItems((currentItems) =>
       currentItems.filter((item) => item.id !== planningItemId)
@@ -624,11 +961,34 @@ export default function Home() {
     }
 
     if (selectedCellAvailability) {
+      const previousAvailability = selectedCellAvailability;
+
       setEmployeeAvailability((currentAvailability) =>
         clearEmployeeAvailability(currentAvailability, selectedCell)
       );
+
+      if (shouldPersistPlanningItems()) {
+        deletePlannerAvailability(selectedCell).catch(() => {
+          setEmployeeAvailability((currentAvailability) =>
+            upsertEmployeeAvailabilityInState(
+              currentAvailability,
+              previousAvailability
+            )
+          );
+          setPlanningSaveError(
+            "Availability niet gewist in Supabase. Probeer opnieuw."
+          );
+        });
+      }
+
       return;
     }
+
+    const nextAvailability = {
+      employeeId: selectedCell.employeeId,
+      date: selectedCell.date,
+      type: "unavailable" as const
+    };
 
     setEmployeeAvailability((currentAvailability) =>
       setEmployeeAvailabilityType(
@@ -637,6 +997,22 @@ export default function Home() {
         "unavailable"
       )
     );
+
+    if (shouldPersistPlanningItems() && auditUser) {
+      upsertPlannerAvailability(selectedCell, "unavailable", auditUser).catch(
+        () => {
+          setEmployeeAvailability((currentAvailability) =>
+            removeEmployeeAvailabilityFromState(
+              currentAvailability,
+              nextAvailability
+            )
+          );
+          setPlanningSaveError(
+            "Availability niet opgeslagen in Supabase. Probeer opnieuw."
+          );
+        }
+      );
+    }
   }
 
   function setSelectedCellAvailabilityType(type: AvailabilityType) {
@@ -644,9 +1020,35 @@ export default function Home() {
       return;
     }
 
+    const previousAvailability = selectedCellAvailability;
+    const nextAvailability = {
+      employeeId: selectedCell.employeeId,
+      date: selectedCell.date,
+      type
+    };
+
     setEmployeeAvailability((currentAvailability) =>
       setEmployeeAvailabilityType(currentAvailability, selectedCell, type)
     );
+
+    if (shouldPersistPlanningItems() && auditUser) {
+      upsertPlannerAvailability(selectedCell, type, auditUser).catch(() => {
+        setEmployeeAvailability((currentAvailability) =>
+          previousAvailability
+            ? upsertEmployeeAvailabilityInState(
+                currentAvailability,
+                previousAvailability
+              )
+            : removeEmployeeAvailabilityFromState(
+                currentAvailability,
+                nextAvailability
+              )
+        );
+        setPlanningSaveError(
+          "Availability niet opgeslagen in Supabase. Probeer opnieuw."
+        );
+      });
+    }
   }
 
   function moveSelectedCardToActiveDestination() {
@@ -718,6 +1120,7 @@ export default function Home() {
 
           <PlanningForm
             actionContext={actionContext}
+            auditUser={auditUser}
             employees={visibleEmployees}
             resources={resources}
             resourcesAreLoading={resourceLoadState === "loading"}
@@ -726,6 +1129,7 @@ export default function Home() {
             key={currentWeekStartDate}
             onCreate={addPlanningItem}
             onEditChange={updatePlanningItem}
+            onFlushPendingEdits={flushPendingPlanningItemSaves}
             selectedCell={selectedCell}
           />
 
