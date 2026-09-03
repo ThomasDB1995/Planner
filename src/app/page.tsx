@@ -233,34 +233,6 @@ export default function Home() {
         email: authSession.user.email
       }
     : undefined;
-  const resourceStatusLabel =
-    resourceLoadState === "ready"
-      ? `Supabase · ${resources.length} materieelitems`
-      : resourceLoadState === "loading"
-        ? "Supabase · materieel laden"
-        : resourceLoadState === "error"
-          ? "Supabase · materieel niet geladen"
-          : hasSupabaseConnection
-            ? "Supabase ingesteld"
-            : "Supabase niet ingesteld";
-  const employeeStatusLabel =
-    employeeLoadState === "ready"
-      ? `${plannerEmployees.length} werknemers`
-      : employeeLoadState === "loading"
-        ? "werknemers laden"
-        : employeeLoadState === "error"
-          ? "werknemers fallback"
-          : `${plannerEmployees.length} werknemers`;
-  const planningStatusLabel =
-    planningItemsLoadState === "ready"
-      ? "planning opgeslagen"
-      : planningItemsLoadState === "loading"
-        ? "planning laden"
-        : planningItemsLoadState === "error"
-          ? "planning niet geladen"
-          : hasSupabaseConnection
-            ? "planning klaar"
-            : "planning lokaal";
   const activeWeekKey = getIsoWeekKey(currentWeekStartDate);
   const activeWeeklyEmployeeIds = weeklyEmployeeIdsByWeek[activeWeekKey] ?? [];
   const visibleWeekDates = new Set(days.map((day) => day.date));
@@ -1109,40 +1081,29 @@ export default function Home() {
                   optioneel materieel en conflictwaarschuwingen.
                 </p>
               </div>
-              <div className="flex max-w-full flex-wrap gap-1.5 lg:max-w-[560px] lg:justify-end">
-                <div className="flex rounded-md border border-slate-200 bg-slate-50 p-0.5 text-xs font-semibold">
-                  <button
-                    className={`rounded px-2 py-1 ${
-                      !isPlannerEditMode
-                        ? "bg-white text-perceel-dark shadow-sm"
-                        : "text-slate-500 hover:text-perceel-dark"
-                    }`}
-                    onClick={() => switchPlannerMode(false)}
-                    type="button"
-                  >
-                    Bekijken
-                  </button>
-                  <button
-                    className={`rounded px-2 py-1 ${
-                      isPlannerEditMode
-                        ? "bg-perceel-green text-white shadow-sm"
-                        : "text-slate-500 hover:text-perceel-dark"
-                    }`}
-                    onClick={() => switchPlannerMode(true)}
-                    type="button"
-                  >
-                    Bewerken
-                  </button>
-                </div>
-                <p className="max-w-full rounded border border-emerald-100 bg-emerald-50 px-2 py-1 text-xs font-semibold text-slate-600">
-                  Datalaag: {resourceStatusLabel}
-                </p>
-                <p className="max-w-full rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-600">
-                  Werknemers: {employeeStatusLabel}
-                </p>
-                <p className="max-w-full rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-600">
-                  Planning: {planningStatusLabel}
-                </p>
+              <div className="flex max-w-full flex-wrap gap-2 lg:justify-end">
+                <button
+                  className={`rounded-md border px-4 py-2 text-sm font-bold shadow-sm ${
+                    !isPlannerEditMode
+                      ? "border-perceel-green bg-perceel-green text-white"
+                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
+                  }`}
+                  onClick={() => switchPlannerMode(false)}
+                  type="button"
+                >
+                  Bekijken
+                </button>
+                <button
+                  className={`rounded-md border px-4 py-2 text-sm font-bold shadow-sm ${
+                    isPlannerEditMode
+                      ? "border-perceel-green bg-perceel-green text-white"
+                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
+                  }`}
+                  onClick={() => switchPlannerMode(true)}
+                  type="button"
+                >
+                  Bewerken
+                </button>
               </div>
             </div>
           </header>
