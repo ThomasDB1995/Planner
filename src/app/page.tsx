@@ -419,7 +419,7 @@ export default function Home() {
           Werkplanning & Materieelbeheer
         </h1>
         <p className="mt-1 max-w-3xl text-sm leading-5 text-slate-700">
-          Weekplanning per werknemer met optioneel materieel en
+          Weekplanning van maandag tot zondag per werknemer met optioneel materieel en
           conflictwaarschuwingen.
         </p>
 
