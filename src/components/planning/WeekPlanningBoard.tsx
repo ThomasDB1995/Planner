@@ -36,6 +36,7 @@ type WeekPlanningBoardProps = {
   activeDestinationCell: SelectedPlanningCell | null;
   selectedCellAvailability?: EmployeeAvailability;
   canMoveSelectedCard: boolean;
+  isEditingEnabled?: boolean;
   onSelectCell: (cell: SelectedPlanningCell) => void;
   onSelectCard: (card: SelectedPlanningCard) => void;
   onDeleteCard: (planningItemId: string) => void;
@@ -95,6 +96,7 @@ export function WeekPlanningBoard({
   activeDestinationCell,
   selectedCellAvailability,
   canMoveSelectedCard,
+  isEditingEnabled = true,
   onSelectCell,
   onSelectCard,
   onDeleteCard,
@@ -258,7 +260,7 @@ export function WeekPlanningBoard({
           ) : null}
         </div>
         <div className="flex min-h-[34px] flex-wrap items-center justify-start gap-2 lg:justify-end">
-          {selectedCell ? (
+          {isEditingEnabled && selectedCell ? (
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
               <button
                 className={`rounded-md border px-3 py-2 text-xs font-semibold ${
@@ -296,7 +298,7 @@ export function WeekPlanningBoard({
               </select>
             </div>
           ) : null}
-          {canMoveSelectedCard ? (
+          {isEditingEnabled && canMoveSelectedCard ? (
             <button
               className="w-full rounded-md bg-perceel-green px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-800 sm:w-auto"
               data-action="move-selected-card"
@@ -324,7 +326,7 @@ export function WeekPlanningBoard({
           return (
             <div key={employee.id}>
               {showCategorySeparator ? (
-                <div className="min-w-[760px] border-b border-slate-300 bg-slate-200/85 px-2 py-1 sm:min-w-[920px] lg:min-w-[1040px]">
+                <div className="min-w-[calc(116px+7*(100vw-152px))] border-b border-slate-300 bg-slate-200/85 px-2 py-1 sm:min-w-[920px] lg:min-w-[1040px]">
                   <div className="sticky left-0 z-20 w-fit rounded-sm bg-slate-200/95 pr-2 text-[10px] font-bold uppercase tracking-wide text-slate-600">
                     {employee.category}
                   </div>
@@ -336,6 +338,7 @@ export function WeekPlanningBoard({
                 employee={employee}
                 rowIndex={index}
                 employeeAvailability={employeeAvailability}
+                isEditingEnabled={isEditingEnabled}
                 items={items}
                 onDeleteCard={onDeleteCard}
                 onRemoveEmployeeFromWeek={onRemoveEmployeeFromWeek}

@@ -197,6 +197,7 @@ export default function Home() {
   const [planningItemsLoadState, setPlanningItemsLoadState] =
     useState<PlanningItemsLoadState>("idle");
   const [planningSaveError, setPlanningSaveError] = useState("");
+  const [isPlannerEditMode, setIsPlannerEditMode] = useState(false);
   const planningItemSaveTimeoutsRef = useRef<
     Record<string, ReturnType<typeof setTimeout>>
   >({});
@@ -352,6 +353,17 @@ export default function Home() {
   const handleAuthSessionChange = useCallback((nextSession: Session | null) => {
     setAuthSession(nextSession);
   }, []);
+
+  function switchPlannerMode(nextIsEditMode: boolean) {
+    setIsPlannerEditMode(nextIsEditMode);
+
+    if (!nextIsEditMode) {
+      clearPlannerSelection();
+      setShowHiddenEmployees(false);
+      setShowWeekEmployeePanel(false);
+      setWeekEmployeeToAddId("");
+    }
+  }
 
   useEffect(() => {
     if (!hasSupabaseConnection || !authSession) {
@@ -1098,6 +1110,30 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex max-w-full flex-wrap gap-1.5 lg:max-w-[560px] lg:justify-end">
+                <div className="flex rounded-md border border-slate-200 bg-slate-50 p-0.5 text-xs font-semibold">
+                  <button
+                    className={`rounded px-2 py-1 ${
+                      !isPlannerEditMode
+                        ? "bg-white text-perceel-dark shadow-sm"
+                        : "text-slate-500 hover:text-perceel-dark"
+                    }`}
+                    onClick={() => switchPlannerMode(false)}
+                    type="button"
+                  >
+                    Bekijken
+                  </button>
+                  <button
+                    className={`rounded px-2 py-1 ${
+                      isPlannerEditMode
+                        ? "bg-perceel-green text-white shadow-sm"
+                        : "text-slate-500 hover:text-perceel-dark"
+                    }`}
+                    onClick={() => switchPlannerMode(true)}
+                    type="button"
+                  >
+                    Bewerken
+                  </button>
+                </div>
                 <p className="max-w-full rounded border border-emerald-100 bg-emerald-50 px-2 py-1 text-xs font-semibold text-slate-600">
                   Datalaag: {resourceStatusLabel}
                 </p>
@@ -1118,22 +1154,25 @@ export default function Home() {
             </p>
           ) : null}
 
-          <PlanningForm
-            actionContext={actionContext}
-            auditUser={auditUser}
-            employees={visibleEmployees}
-            resources={resources}
-            resourcesAreLoading={resourceLoadState === "loading"}
-            resourcesLoadError={resourceLoadState === "error"}
-            editingItem={editingPlanningItem}
-            key={currentWeekStartDate}
-            onCreate={addPlanningItem}
-            onEditChange={updatePlanningItem}
-            onFlushPendingEdits={flushPendingPlanningItemSaves}
-            selectedCell={selectedCell}
-          />
+          {isPlannerEditMode ? (
+            <PlanningForm
+              actionContext={actionContext}
+              auditUser={auditUser}
+              employees={visibleEmployees}
+              resources={resources}
+              resourcesAreLoading={resourceLoadState === "loading"}
+              resourcesLoadError={resourceLoadState === "error"}
+              editingItem={editingPlanningItem}
+              key={currentWeekStartDate}
+              onCreate={addPlanningItem}
+              onEditChange={updatePlanningItem}
+              onFlushPendingEdits={flushPendingPlanningItemSaves}
+              selectedCell={selectedCell}
+            />
+          ) : null}
 
-          <div className="rounded-md border border-perceel-line bg-white px-3 py-2 text-xs shadow-sm">
+          {isPlannerEditMode ? (
+            <div className="rounded-md border border-perceel-line bg-white px-3 py-2 text-xs shadow-sm">
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
               <span className="font-semibold text-slate-600">Werknemers</span>
               <button
@@ -1275,9 +1314,10 @@ export default function Home() {
                 ) : null}
               </div>
             ) : null}
-          </div>
+            </div>
+          ) : null}
 
-          {selectedCell && selectedCellEmployee ? (
+          {isPlannerEditMode && selectedCell && selectedCellEmployee ? (
             <WorkCardPreview
               date={selectedCell.date}
               employee={selectedCellEmployee}
@@ -1293,6 +1333,7 @@ export default function Home() {
             employeeAvailability={employeeAvailability}
             employees={visibleEmployees}
             items={visiblePlanningItems}
+            isEditingEnabled={isPlannerEditMode}
             canMoveSelectedCard={canMoveSelectedCard}
             onDeleteCard={deletePlanningItem}
             onGoToCurrentWeek={goToCurrentWeek}

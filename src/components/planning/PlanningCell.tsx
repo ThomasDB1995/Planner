@@ -30,6 +30,7 @@ type PlanningCellProps = {
   selectedCell: SelectedPlanningCell | null;
   selectedCard: SelectedPlanningCard | null;
   activeDestinationCell: SelectedPlanningCell | null;
+  isEditingEnabled?: boolean;
   onSelectCell: (cell: SelectedPlanningCell) => void;
   onSelectCard: (card: SelectedPlanningCard) => void;
   onDeleteCard: (planningItemId: string) => void;
@@ -85,6 +86,7 @@ export function PlanningCell({
   selectedCell,
   selectedCard,
   activeDestinationCell,
+  isEditingEnabled = true,
   onSelectCell,
   onSelectCard,
   onDeleteCard
@@ -96,7 +98,7 @@ export function PlanningCell({
   const isDestination =
     activeDestinationCell?.employeeId === employeeId &&
     activeDestinationCell.date === date;
-  const isRelocationContext = Boolean(selectedCard);
+  const isRelocationContext = isEditingEnabled && Boolean(selectedCard);
   const baseCellStateStyle =
     isRelocationContext && hasPlanningItems
       ? "border-amber-100 bg-amber-50/20 shadow-[inset_0_0_0_1px_rgba(245,158,11,0.12)] hover:bg-amber-50/35"
@@ -114,21 +116,31 @@ export function PlanningCell({
 
   return (
     <div
-      className={`h-full min-h-[72px] cursor-pointer border-r border-slate-300/80 px-1 py-1 outline-none last:border-r-0 ${stateStyle}`}
+      className={`h-full min-h-[72px] border-r border-slate-300/80 px-1 py-1 outline-none last:border-r-0 ${
+        isEditingEnabled ? "cursor-pointer" : ""
+      } ${stateStyle}`}
       data-date={date}
       data-destination={isDestination ? "true" : "false"}
       data-employee-id={employeeId}
       data-selected={isSelected ? "true" : "false"}
       data-availability-type={availabilityType}
-      onClick={() => onSelectCell({ employeeId, date })}
+      onClick={() => {
+        if (isEditingEnabled) {
+          onSelectCell({ employeeId, date });
+        }
+      }}
       onKeyDown={(event) => {
+        if (!isEditingEnabled) {
+          return;
+        }
+
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           onSelectCell({ employeeId, date });
         }
       }}
-      role="button"
-      tabIndex={0}
+      role={isEditingEnabled ? "button" : undefined}
+      tabIndex={isEditingEnabled ? 0 : undefined}
     >
       <div className="space-y-1">
         {availabilityType && !hasPlanningItems ? (
@@ -156,7 +168,10 @@ export function PlanningCell({
             conflicts={conflicts.filter((conflict) =>
               conflict.planningItemIds.includes(item.id)
             )}
-            isSelected={selectedCard?.planningItemId === item.id}
+            isEditingEnabled={isEditingEnabled}
+            isSelected={
+              isEditingEnabled && selectedCard?.planningItemId === item.id
+            }
             item={item}
             key={item.id}
             onDelete={() => onDeleteCard(item.id)}

@@ -6,6 +6,7 @@ type PlanningCardProps = {
   resources: Resource[];
   conflicts: PlanningConflict[];
   isSelected: boolean;
+  isEditingEnabled?: boolean;
   onSelect: () => void;
   onDelete: () => void;
 };
@@ -24,6 +25,7 @@ export function PlanningCard({
   resources,
   conflicts,
   isSelected,
+  isEditingEnabled = true,
   onSelect,
   onDelete
 }: PlanningCardProps) {
@@ -49,11 +51,17 @@ export function PlanningCard({
 
   return (
     <article
-      className={`relative border-l-4 border-slate-300 bg-white px-1.5 py-0.5 pr-6 text-xs leading-4 text-slate-700 ${
+      className={`relative border-l-4 border-slate-300 bg-white px-1.5 py-0.5 text-xs leading-4 text-slate-700 ${
+        isEditingEnabled || auditInitial ? "pr-6" : ""
+      } ${
         auditInitial ? "pb-3" : ""
       } ${selectedStyle}`}
       data-selected={isSelected ? "true" : "false"}
       onClick={(event) => {
+        if (!isEditingEnabled) {
+          return;
+        }
+
         event.stopPropagation();
         onSelect();
       }}
@@ -61,17 +69,19 @@ export function PlanningCard({
       <p className="truncate font-semibold text-slate-950" title={item.taskName}>
         {item.taskName}
       </p>
-      <button
-        aria-label={`Verwijder ${item.taskName}`}
-        className="absolute right-1 top-0.5 rounded border border-transparent px-1 text-[11px] font-bold leading-3 text-slate-500 hover:border-slate-300 hover:bg-white hover:text-red-700"
-        onClick={(event) => {
-          event.stopPropagation();
-          onDelete();
-        }}
-        type="button"
-      >
-        x
-      </button>
+      {isEditingEnabled ? (
+        <button
+          aria-label={`Verwijder ${item.taskName}`}
+          className="absolute right-1 top-0.5 rounded border border-transparent px-1 text-[11px] font-bold leading-3 text-slate-500 hover:border-slate-300 hover:bg-white hover:text-red-700"
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete();
+          }}
+          type="button"
+        >
+          x
+        </button>
+      ) : null}
       {resources.length > 0 ? (
         <div
           className="mt-0.5 flex min-w-0 flex-wrap gap-1"

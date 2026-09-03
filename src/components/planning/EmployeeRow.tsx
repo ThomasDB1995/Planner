@@ -25,6 +25,7 @@ type EmployeeRowProps = {
   selectedCell: SelectedPlanningCell | null;
   selectedCard: SelectedPlanningCard | null;
   activeDestinationCell: SelectedPlanningCell | null;
+  isEditingEnabled?: boolean;
   onSelectCell: (cell: SelectedPlanningCell) => void;
   onSelectCard: (card: SelectedPlanningCard) => void;
   onDeleteCard: (planningItemId: string) => void;
@@ -47,6 +48,7 @@ export function EmployeeRow({
   selectedCell,
   selectedCard,
   activeDestinationCell,
+  isEditingEnabled = true,
   onSelectCell,
   onSelectCard,
   onDeleteCard,
@@ -58,7 +60,7 @@ export function EmployeeRow({
   const employeeCellToneStyle =
     rowTone === "soft" ? "bg-slate-100/95" : "bg-white/95";
   const canRemoveFromWeek =
-    isWeeklyAddedEmployee && Boolean(onRemoveEmployeeFromWeek);
+    isEditingEnabled && isWeeklyAddedEmployee && Boolean(onRemoveEmployeeFromWeek);
   const employeeActionLabel = `${employeeDisplayName} uit deze week halen`;
   const employeeActionTitle = `${employeeDisplayName} uit deze week halen`;
 
@@ -70,7 +72,7 @@ export function EmployeeRow({
   }
 
   return (
-    <div className="group grid min-w-[760px] grid-cols-[118px_repeat(7,minmax(92px,1fr))] items-stretch border-b border-slate-300/80 last:border-b-0 sm:min-w-[920px] sm:grid-cols-[144px_repeat(7,minmax(110px,1fr))] lg:min-w-[1040px] lg:grid-cols-[156px_repeat(7,minmax(126px,1fr))]">
+    <div className="group grid min-w-[calc(116px+7*(100vw-152px))] grid-cols-[116px_repeat(7,minmax(220px,calc(100vw-152px)))] items-stretch border-b border-slate-300/80 last:border-b-0 sm:min-w-[920px] sm:grid-cols-[144px_repeat(7,minmax(110px,1fr))] lg:min-w-[1040px] lg:grid-cols-[156px_repeat(7,minmax(126px,1fr))]">
       <div
         className={`sticky left-0 z-10 flex min-h-[72px] items-center border-r border-slate-300 px-1.5 py-1.5 text-[12px] font-semibold text-perceel-dark sm:px-2 sm:text-sm ${employeeCellToneStyle}`}
       >
@@ -103,6 +105,7 @@ export function EmployeeRow({
           items={items}
           key={day.date}
           onDeleteCard={onDeleteCard}
+          isEditingEnabled={isEditingEnabled}
           onSelectCard={onSelectCard}
           onSelectCell={onSelectCell}
           resources={resources}
