@@ -37,6 +37,27 @@ function isWeekendDay(day: WeekDay): boolean {
   return day.dayLabel === "Zaterdag" || day.dayLabel === "Zondag";
 }
 
+function getEmployeeNameParts(employee: Employee): {
+  firstName: string;
+  lastName: string;
+} {
+  const firstName = employee.firstName.trim();
+  const lastName = employee.lastName.trim();
+
+  if (firstName && lastName) {
+    return { firstName, lastName };
+  }
+
+  const displayName = getEmployeeDisplayName(employee);
+  const [fallbackFirstName = "", ...fallbackLastNameParts] =
+    displayName.split(/\s+/);
+
+  return {
+    firstName: fallbackFirstName,
+    lastName: fallbackLastNameParts.join(" ")
+  };
+}
+
 export function EmployeeRow({
   employee,
   rowIndex,
@@ -56,8 +77,8 @@ export function EmployeeRow({
   isWeeklyAddedEmployee = false
 }: EmployeeRowProps) {
   const employeeDisplayName = getEmployeeDisplayName(employee);
-  const employeeFirstName = employee.firstName.trim();
-  const employeeLastName = employee.lastName.trim();
+  const { firstName: employeeFirstName, lastName: employeeLastName } =
+    getEmployeeNameParts(employee);
   const rowTone = rowIndex % 2 === 1 ? "soft" : "plain";
   const employeeCellToneStyle =
     rowTone === "soft" ? "bg-slate-100/95" : "bg-white/95";
