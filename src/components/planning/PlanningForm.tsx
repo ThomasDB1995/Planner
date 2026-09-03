@@ -13,6 +13,8 @@ import type { Employee, PlanningItem, Resource } from "@/types/planning";
 type PlanningFormProps = {
   employees: Employee[];
   resources: Resource[];
+  resourcesAreLoading?: boolean;
+  resourcesLoadError?: boolean;
   editingItem?: PlanningItem;
   actionContext: {
     label: string;
@@ -44,6 +46,8 @@ const initialFormState: PlanningFormState = {
 export function PlanningForm({
   employees,
   resources,
+  resourcesAreLoading = false,
+  resourcesLoadError = false,
   editingItem,
   actionContext,
   onCreate,
@@ -168,10 +172,10 @@ export function PlanningForm({
 
   return (
     <form
-      className="sticky top-2 z-30 rounded-md border border-perceel-line bg-white p-3 shadow-sm"
+      className="sticky top-14 z-30 rounded-md border border-perceel-line bg-white p-3 shadow-sm sm:top-3"
       onSubmit={submitPlanningItem}
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase text-perceel-green">
             {isEditMode ? "Bewerken" : "Invoer"}
@@ -181,7 +185,7 @@ export function PlanningForm({
               {isEditMode ? "Planningitem bewerken" : "Planningitem toevoegen"}
             </h2>
             <span
-              className={`inline-flex max-w-[520px] items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px] font-semibold ${actionContextStyle}`}
+              className={`inline-flex max-w-full items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px] font-semibold sm:max-w-[520px] ${actionContextStyle}`}
               title={`${actionContext.label}: ${actionContext.detail}`}
             >
               <span className="shrink-0">{actionContext.label}</span>
@@ -191,7 +195,7 @@ export function PlanningForm({
             </span>
           </div>
         </div>
-        <div className="rounded-md border border-perceel-line bg-slate-50 px-2.5 py-1.5 text-right">
+        <div className="rounded-md border border-perceel-line bg-slate-50 px-2.5 py-1.5 text-left sm:min-w-[190px] sm:text-right">
           <p className="text-[10px] font-semibold uppercase text-slate-500">
             {isEditMode ? "Geselecteerde card" : "Actieve cel"}
           </p>
@@ -209,11 +213,11 @@ export function PlanningForm({
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-[130px_145px_minmax(260px,1fr)_auto] gap-2.5">
+      <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-[130px_145px_minmax(260px,1fr)_auto]">
         <label className="text-xs font-semibold text-slate-700">
           Datum
           <input
-            className={`mt-1 w-full rounded-md border border-perceel-line px-2 py-1 text-sm ${
+            className={`mt-1 h-9 w-full rounded-md border border-perceel-line px-2 py-1 text-sm lg:h-auto ${
               isEditMode ? "bg-slate-100 text-slate-500" : ""
             }`}
             disabled={isEditMode}
@@ -226,7 +230,7 @@ export function PlanningForm({
         <label className="text-xs font-semibold text-slate-700">
           Werknemer
           <select
-            className={`mt-1 w-full rounded-md border border-perceel-line px-2 py-1 text-sm ${
+            className={`mt-1 h-9 w-full rounded-md border border-perceel-line px-2 py-1 text-sm lg:h-auto ${
               isEditMode ? "bg-slate-100 text-slate-500" : ""
             }`}
             disabled={isEditMode}
@@ -242,10 +246,10 @@ export function PlanningForm({
           </select>
         </label>
 
-        <label className="text-xs font-semibold text-slate-700">
+        <label className="text-xs font-semibold text-slate-700 sm:col-span-2 lg:col-span-1">
           Taak/project
           <input
-            className="mt-1 w-full rounded-md border border-perceel-line px-2 py-1 text-sm"
+            className="mt-1 h-9 w-full rounded-md border border-perceel-line px-2 py-1 text-sm lg:h-auto"
             onChange={(event) => updateField("taskName", event.target.value)}
             onKeyDown={(event) => {
               if (event.key !== "Enter") {
@@ -265,14 +269,14 @@ export function PlanningForm({
           />
         </label>
 
-        <div className="flex items-end">
+        <div className="flex items-end sm:col-span-2 lg:col-span-1">
           {isEditMode ? (
             <p className="max-w-[160px] pb-1 text-xs font-semibold leading-4 text-slate-500">
               Direct lokaal bijgewerkt.
             </p>
           ) : (
             <button
-              className="h-[30px] rounded-md bg-perceel-green px-3 text-sm font-semibold text-white"
+              className="h-9 w-full rounded-md bg-perceel-green px-3 text-sm font-semibold text-white hover:bg-emerald-800 lg:h-[30px] lg:w-auto"
               type="submit"
             >
               Toevoegen
@@ -291,6 +295,8 @@ export function PlanningForm({
         <ResourceSelector
           onChange={updateResourceIds}
           resources={resources}
+          isLoading={resourcesAreLoading}
+          hasLoadError={resourcesLoadError}
           selectedResourceIds={formState.resourceIds}
         />
         {!isEditMode ? (

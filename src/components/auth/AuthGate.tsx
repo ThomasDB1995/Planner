@@ -9,9 +9,10 @@ import {
 
 type AuthGateProps = {
   children: React.ReactNode;
+  onSessionChange?: (session: Session | null) => void;
 };
 
-export function AuthGate({ children }: AuthGateProps) {
+export function AuthGate({ children, onSessionChange }: AuthGateProps) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [email, setEmail] = useState("");
@@ -48,6 +49,10 @@ export function AuthGate({ children }: AuthGateProps) {
     };
   }, [supabase]);
 
+  useEffect(() => {
+    onSessionChange?.(session);
+  }, [onSessionChange, session]);
+
   async function submitLogin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -81,7 +86,7 @@ export function AuthGate({ children }: AuthGateProps) {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-perceel-soft px-6">
+      <main className="flex min-h-screen items-center justify-center bg-perceel-soft px-4 sm:px-6">
         <p className="text-sm font-semibold text-slate-600">
           Planner laden...
         </p>
@@ -91,7 +96,7 @@ export function AuthGate({ children }: AuthGateProps) {
 
   if (!isSupabaseConfigured() || !supabase) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-perceel-soft px-6">
+      <main className="flex min-h-screen items-center justify-center bg-perceel-soft px-4 sm:px-6">
         <section className="w-full max-w-md rounded-md border border-perceel-line bg-white p-5">
           <p className="text-xs font-semibold uppercase text-perceel-green">
             Perceel
@@ -110,7 +115,7 @@ export function AuthGate({ children }: AuthGateProps) {
 
   if (!session) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-perceel-soft px-6">
+      <main className="flex min-h-screen items-center justify-center bg-perceel-soft px-4 sm:px-6">
         <section className="w-full max-w-md rounded-md border border-perceel-line bg-white p-5 shadow-sm">
           <p className="text-xs font-semibold uppercase text-perceel-green">
             Perceel
@@ -168,17 +173,19 @@ export function AuthGate({ children }: AuthGateProps) {
 
   return (
     <>
-      <div className="fixed right-3 top-3 z-50 flex items-center gap-2 rounded-md border border-perceel-line bg-white/95 px-2 py-1 text-xs shadow-sm">
-        <span className="max-w-[180px] truncate font-semibold text-slate-600">
-          {session.user.email}
-        </span>
-        <button
-          className="rounded border border-slate-200 bg-slate-50 px-2 py-1 font-semibold text-slate-600 hover:bg-white hover:text-perceel-dark"
-          onClick={signOut}
-          type="button"
-        >
-          Uitloggen
-        </button>
+      <div className="fixed left-3 right-3 top-2 z-50 flex justify-end sm:left-auto sm:top-3">
+        <div className="flex max-w-full items-center gap-2 rounded-md border border-perceel-line bg-white/95 px-2 py-1 text-xs shadow-sm">
+          <span className="max-w-[calc(100vw-150px)] truncate font-semibold text-slate-600 sm:max-w-[180px]">
+            {session.user.email}
+          </span>
+          <button
+            className="rounded border border-slate-200 bg-slate-50 px-2 py-1 font-semibold text-slate-600 hover:bg-white hover:text-perceel-dark"
+            onClick={signOut}
+            type="button"
+          >
+            Uitloggen
+          </button>
+        </div>
       </div>
       {children}
     </>

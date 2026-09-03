@@ -22,7 +22,7 @@ function isWeekendDay(day: WeekDay): boolean {
 
 export function WeekHeader({ days }: WeekHeaderProps) {
   return (
-    <div className="grid min-w-[1340px] grid-cols-[168px_repeat(7,minmax(136px,1fr))] border-b border-slate-300 bg-slate-100 text-xs font-semibold text-slate-600">
+    <div className="grid min-w-[1040px] grid-cols-[156px_repeat(7,minmax(126px,1fr))] border-b border-slate-300 bg-slate-100 text-xs font-semibold text-slate-600">
       <div
         aria-hidden="true"
         className="sticky left-0 z-20 border-r border-slate-300 bg-slate-100 px-2 py-1.5"

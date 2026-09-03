@@ -74,9 +74,9 @@ export function EmployeeRow({
   }
 
   return (
-    <div className="group grid min-w-[1340px] grid-cols-[168px_repeat(7,minmax(136px,1fr))] items-stretch border-b border-slate-300/80 last:border-b-0">
+    <div className="group grid min-w-[1040px] grid-cols-[156px_repeat(7,minmax(126px,1fr))] items-stretch border-b border-slate-300/80 last:border-b-0">
       <div
-        className={`sticky left-0 z-10 flex min-h-[72px] items-center border-r border-slate-300 px-2 py-1.5 text-sm font-semibold text-perceel-dark ${employeeCellToneStyle}`}
+        className={`sticky left-0 z-10 flex min-h-[72px] items-center border-r border-slate-300 px-2 py-1.5 text-[13px] font-semibold text-perceel-dark sm:text-sm ${employeeCellToneStyle}`}
       >
         <div className="relative min-w-0 w-full pr-5">
           <span

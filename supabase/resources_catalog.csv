@@ -1,0 +1,240 @@
+id,number,group,name,brand,category,type,is_defective,is_favorite
+resource-0512-kmb,0512-KMB-,KMB,Dennis G860,Dennis,machine,G860,false,false
+resource-0511-vcb,0511-VCB-,VCB,Nissan Townstar,Nissan,voertuig,Townstar,false,false
+resource-0510-vcb,0510-VCB-,VCB,Volkswagen Crafter,Volkswagen,voertuig,Crafter,false,false
+resource-0509-vpw,0509-VPW-,VPW,Volvo EX90,Volvo,voertuig,EX90,false,false
+resource-0508-kmh,0508-KMH-,KMH,Egalisatieschijf,StrakVlak,machine,,false,false
+resource-0507-tal,0507-TAL-,TAL,Spin Rake,Spin Turf Machinery,machine,,false,false
+resource-0506-kmh,0506-KMH-,KMH,Belijningskar,Footline,machine,Classic 100,false,false
+resource-0505-whm,0505-WHM-,WHM,Heftruck,Manitou,machine,ME 425 C,false,false
+resource-0504-km2t,0504-KM2T-,KM2T,Bladblazer,Maruyama,machine,BL8200SP(CE),false,false
+resource-0503-whm,0503-WHM-,WHM,Verwarmer,Master,machine,XL9S INFRAROOD,false,false
+resource-0502-whm,0502-WHM-,WHM,Hogedrukreiniger,Kränzle,machine,WARM WATER THERM 1017,false,false
+resource-0501-kmh,0501-KMH-,KMH,Precisiestrooier,Gandy,machine,,false,false
+resource-0500-km2t,0500-KM2T-,KM2T,Slijpschijf op motor,Husqvarna,machine,,false,false
+resource-0499-kmb,0499-KMB-,KMB,Grondboor,Stihl,machine,,false,false
+resource-0498-tsl,0498-TSL-,TSL,Sleep drainagevuller,AVS,machine,,false,false
+resource-0497-km2t,0497-KM2T-,KM2T,Kettingzaag,Stihl,machine,,false,false
+resource-0496-km2t,0496-KM2T-,KM2T,Bosmaaier/combimotor,Stihl,werktuig,,false,false
+resource-0495-kmb,0495-KMB-,KMB,Handmaaier met rol honda,Honda,werktuig,HRH 536K QX BENZINE,false,false
+resource-0494-kmb,0494-KMB-,KMB,Handmaaier met rol honda,Honda,werktuig,HRH 536K QX BENZINE,false,false
+resource-0493-kmb,0493-KMB-,KMB,Handmaaier 4 wielen honda,Honda,werktuig,HRH 536K HX BENZINE,false,false
+resource-0492-kmb,0492-KMB-,KMB,Handmaaier met rol honda,Honda,werktuig,HRH 536K QX BENZINE,false,false
+resource-0491-kmb,0491-KMB-,KMB,Handmaaier met rol honda,Honda,werktuig,HRH 536K QX BENZINE,false,false
+resource-0490-kmb,0490-KMB-,KMB,Handmaaier met rol honda,Honda,werktuig,HRH 536K QX BENZINE,false,false
+resource-0489-vcb,0489-VCB-,VCB,Volkswagen Crafter,Volkswagen,voertuig,Crafter,false,false
+resource-0488-ext,0488-EXT-,EXT,Dennis ES-860 cylindermaaier met volgzit (Gemeente Beveren),Dennis,werktuig,ES-860,false,false
+resource-0487-ext,0487-EXT-,EXT,Ransomes Mastiff met volgzit (Gemeente Beveren),Ransomes,machine,Mastiff,false,false
+resource-0486-kmb,0486-KMB-,KMB,Ferris Zero Turn Mower,Ferris,machine,ISX 800,false,false
+resource-0485-kma,0485-KMA-,KMA,Grasmaaier Stihl RMA 765 V,Stihl,werktuig,RMA 765 V,false,false
+resource-0484-kma,0484-KMA-,KMA,Grasmaaier Stihl RMA 765 V,Stihl,werktuig,RMA 765 V,false,false
+resource-0483-vco,0483-VCO-,VCO,Plateau container,,machine,Technicas,false,false
+resource-0482-kmb,0482-KMB-,KMB,Handmaaier met rol honda,Honda,werktuig,HRH 536K QX,false,false
+resource-0481-kmb,0481-KMB-,KMB,Handmaaier met rol honda,Honda,werktuig,HRH 536K QX,false,false
+resource-0480-tal,0480-TAL-,TAL,Rotoregde,,machine,,false,false
+resource-0479-has,0479-HAS-,HAS,Dubbele rolcart robot beregener,,machine,,false,false
+resource-0478-wst,0478-WST-,WST,Update machine +stroomunit,,machine,,false,false
+resource-0474-tal,0474-TAL-,TAL,Spin rake,,machine,,false,false
+resource-0472-val,0472-VAL,VAL,Aanhangwagen,,aanhanger,,false,false
+resource-0471-tal,0471-TAL-,TAL,Pendelstrooier Vicon,Vicon,machine,VNPS604H,false,false
+resource-0470-vpw,0470-VPW-,VPW,Volvo XC40,Volvo,voertuig,XC40,false,false
+resource-0469-km2t,0469-KM2T,KM2T,Zaagmachien,,machine,,false,false
+resource-0468-vaz,0468-VAZ-,VAZ,Drieassige dieplader (wipkar ),Dezeure,aanhanger,,false,false
+resource-0467-whm,0467-WHM-,WHM,Vetspuit op accu,Dewalt,machine,dcgg57,false,false
+resource-0466-whm,0466-WHM-,WHM,Stofzuiger,,machine,,false,false
+resource-0465-whm,0465-WHM-,WHM,Compresor mekanieker,FINI,machine,,false,false
+resource-0464-kmb,0464-KMB-,KMB,Zodensnijder,Classen,machine,,false,false
+resource-0463-kma,0463-KMA-,KMA,Haagschaar Stihl,Stihl,machine,,false,false
+resource-0462-kmb,0462-KMB-,KMB,Haagschaar,,machine,,false,false
+resource-0461-km2t,0461-KM2T,KM2T,Combimotor,stihl,machine,,false,false
+resource-0460-hst,0460-HST,HST,Spindelstatief,Nestle,machine,,false,false
+resource-0459-kma,0459-KMA-,KMA,Haakse schroefmachine dewalt,DEAWALT,machine,,false,false
+resource-0458-tal,0458-TAL-,TAL,Diepwoeler doelgebieden avs,,machine,,false,false
+resource-0457-kmb,0457-KMB-,KMB,Grasmaaier sabo 54,sabo,werktuig,vario 54,false,false
+resource-0456-tve,0456-TVE-,TVE,Vertidrain mustang 7117 WD 15 CM WB 170,REDEXIM,machine,mustang 7117,false,false
+resource-0455-vvc,0455-VVC-,VVC,Volvo FM Containervrachtwagen,Volvo,voertuig,FM,false,false
+resource-0454-kra,0454-KRA-,KRA,Sunward 20F,Sunward,machine,20F,false,false
+resource-0453-mr3,0453-MR3-,MR3,3 Delige rotatieve maaier 350 cm werkbreedte met cabine,John Deere,werktuig,Wam 1600 turbo,false,false
+resource-0452-vpw,0452-VPW-,VPW,Volvo V90 R - T8 AWD plug-in hybrid,VOLVO,voertuig,V90,false,false
+resource-0451-kra,0451-KRA-,KRA,CASE CX60 Minigraver,CASE,machine,CX60 C CAB,false,false
+resource-0451-hst,0451-HST-,HST,Hydraulische kantelbak,,werktuig,,false,false
+resource-0450-kmb,0450-KMB-,KMB,Gazonmaaier Toro Timemaster,Toro,werktuig,Timemaster 20977,false,false
+resource-0449-tal,0449-TAL-,TAL,Optimer,,machine,,false,false
+resource-0448-tdu,0448-TDU-,TDU,Kipwagen met schoven,,voertuig,,false,false
+resource-0447-whm,0447-WHM-,WHM,Hogedrukreiniger Karcher,KARCHER,machine,HDS 6/14-4 CX,false,false
+resource-0446-mr3,0446-MR3-,MR3,3 Delige rotatieve maaier 350 cm werkbreedte met cabine,John Deere,werktuig,Wam 1600 turbo,false,false
+resource-0445-trl,0445-TRL-,TRL,TRAKTOR CASE IH FARMALL 100,CASE IH,machine,FARMALL 100 C 1.5 STAGE V - SIC319274,false,false
+resource-0444-trl,0444-TRL-,TRL,TRAKTOR CASE IH FARMALL 100,CASE IH,machine,FARMALL 100 C 1. STAGE V - SIC319275,false,false
+resource-0443-kma,0443-KMA-,KMA,Dennis accu stadionmaaier,Dennis,werktuig,ES-34R,false,false
+resource-0442-tma,0442-TMA-,TMA,Hydraulische palenmaaier Agrimaster,Agrimaster,werktuig,Olivia X60,false,false
+resource-0441-tsl,0441-TSL-,TSL,Sleep piste Equitech,Equitech,machine,PM Multi 200 cms ID M200 0429,false,false
+resource-0440-whm,0440-WHM-,WHM,Schroefcompressor APS 7.5 BASIC -ITJ421413-I2003119,,machine,Schroefcompressor APS 7.5 BASIC -ITJ421413-I2003119,false,false
+resource-0439-vpw,0439-VPW-,VPW,Opel Grandland X Ultimate,Opel,voertuig,Grandland X Ultimate,false,false
+resource-0438-mc5,0438-MC5-,MC5,5 Delige cylindermaaier 350 cm werkbreedte jumbo,John Deere,werktuig,1905 4WD,false,false
+resource-0437-tdu,0437-TDU-,TDU,SP400 Sandspreader GKB,GKB,machine,SP400,false,false
+resource-0436-vpw,0436-VPW-,VPW,VOLVO V60,VOLVO,voertuig,V60 Momentum Pro D3,false,false
+resource-0435-vvc,0435-VVC-,VVC,DAF TREKKER DIEPLADER C+E,DAF,voertuig,XF 440,false,false
+resource-0433-tal,0433-TAL-,TAL,KORO FIELDTOPMAKER 2.0,KORO,machine,FTM 2.0,false,false
+resource-0432-kmb,0432-KMB-,KMB,Lumag LVS-30GX Trilstamper,LUMAG,werktuig,LVS-30GX,false,false
+resource-0431-trs,0431-TRS-,TRS,SMALSPOORTRACTOR T4.100 F CAB,NEW HOLLAND,machine,T4.100 F CAB,false,false
+resource-0430-kma,0430-KMA-,KMA,Accu kettingzaag Stihl,STIHL,machine,MSA140 C-BQ,false,false
+resource-0429-vaz,0429-VAZ-,VAZ,Aanhangwagen 3500 kg Brian James,Brian James,aanhanger,T-02-T,false,false
+resource-0428-las,0428-LAS-,LAS,DUBBELE HELLINGSLASER GL722/DAGPRIJS,SPECTRA,machine,GL722,false,false
+resource-0427-trl,0427-TRL-,TRL,LANDBOUWTRAKTOR VESTRUM 120 CVX,CASE IH,machine,VESTRUM 120 CVX,false,false
+resource-0426-trl,0426-TRL-,TRL,LANDBOUWTRAKTOR VESTRUM 120 CVX,CASE IH,machine,VESTRUM 120 CVX,false,false
+resource-0425-kmb,0425-KMB-,KMB,Honda UMS 425E1 LNET Bosmaaier,HONDA,werktuig,,false,false
+resource-0424-kmb,0424-KMB-,KMB,Dennis Pro 34 rotatieve stadionmaaier,DENNIS,werktuig,,false,false
+resource-0423-tve,0423-TVE-,TVE,Vertidrain verluchter 40/260,VERTIDRAIN,machine,7626,false,false
+resource-0422-tve,0422-TVE-,TVE,Vertidrain verluchter 40/260,VERTIDRAIN,machine,7626,false,false
+resource-0421-tve,0421-TVE-,TVE,Vertidrain verluchter 40/260,VERTIDRAIN,machine,7626,false,false
+resource-0419-wst,0419-WST,WST,LSM machine,LSM,machine,,false,false
+resource-0418-vaz,0418-VAZ-,VAZ,Aanhangwagen 3500 KG Brian James,Brian James,aanhanger,T-02-T,false,false
+resource-0417-tdo,0417-TDO-,TDO,GEDRAGEN DOORZAAIMACHINE VREDO,VREDO,machine,DUBBEL DIEPTE,false,false
+resource-0415-mr1,0415-MR1-,MR1,Rotatieve frontmaaier met opvangbak werkbreedte 155 cm,GRILLO,werktuig,FD2200,false,false
+resource-0414-has,0414-HAS-,HAS,KLEINE KABEL BEREGENINGS HASPEL,REMO,machine,,false,false
+resource-0413-has,0413-HAS-,HAS,KLEINE KABEL BEREGENINGS HASPEL,REMO,machine,,false,false
+resource-0411-wst,0411-WST-,WST,Transportband,,machine,,false,false
+resource-0409-kmb,0409-KMB-,KMB,VERTICUTEERDER WB 50CM LOSSE MESSEN,BILLY GOAT PR550H,machine,vericuteerder losse messen,false,false
+resource-0408-kmd,0408-KMD-,KMD,NIBBI MOTOCULTEUR 18 PK + ROTOREG WB 100 CM,NIBBI,machine,NIBBI + GAMO,false,false
+resource-0406-bwi,0406-BWI-,BWI,UNICO CONTAINER 2.50 X 6 METER,UNIKO,machine,BUREELCONTAINER,false,false
+resource-0403-mc5,0403-MC5-,MC5,5 Delige cylindermaaier 350 cm werkbreedte,JOHN DEERE,werktuig,1905 4WD,false,false
+resource-0402-mc5,0402-MC5-,MC5,5 Delige cylindermaaier 350 cm werkbreedte,JOHN DEERE,werktuig,1905 4WD,false,false
+resource-0400-tal,0400-TAL-,TAL,MASCHIO FREES WB250,MASCHIO,werktuig,C250 MASCIO,false,false
+resource-0399-trl,0399-TRL-,TRL,LANDBOUWTRACTOR CASE IH Puma 165CVX,CASE IH,machine,CVX 165,false,false
+resource-0397-kra,0397-KRA-,KRA,GRAAFKRAAN 13 TON STAALRUPS,CASE,machine,CASE CX 130 D,false,false
+resource-0396-las,0396-LAS-,LAS,HELLINGSLASER+ONTVANGER,SPECTRA,machine,HELLINGS SPECTRA GL422N,false,false
+resource-0395-vcb,0395-VCB-,VCB,GESLOTEN CAMIONET DUBBEL CAB B,FIAT,voertuig,DUCATO CREWCAB 35 LH2 2.3 JTD 130 E6,false,false
+resource-0392-tal,0392-TAL-,TAL,kilverbord lasergestuurd mecos inclusief 2 ontvangers getrokken en of gedragen,MECOS,machine,Mekos kilver,false,false
+resource-0391-tma,0391-TMA-,TMA,Klepelmaaier werkbreedte 280 cm met sideschift,Masio,werktuig,klepelmaaier Mascio 280cm,false,false
+resource-0389-trl,0389-TRL-,TRL,LANDBOUWTRAKTOR FARMALL 95 PK + FL,CASE IH,machine,FARMALL 95U,false,false
+resource-0389-hst,0389-HST-,HST,Frontaftakas gemonteerd op 0389 TRL,,machine,Kit Frontaftakas,false,false
+resource-0388-tal,0388 TAL,TAL,Versnipperaar TV2026P,Van Dale,machine,Versnipperraar TV2026P,false,false
+resource-0383-tal,0383-TAL-,TAL,WIEDEG TROOSTWIJK,troostwijk,machine,Jacobs WE180 wiedeg,false,false
+resource-0381-mr3,0381-MR3-,MR3,3 Delige rotatieve maaier 350 cm werkbreedte,John Deere,werktuig,Wam 1600 turbo,false,false
+resource-0380-vpw,0380-VPW-,VPW,AUDI A6 ALLROAD FRANS,AUDI,voertuig,A6 ALLROAD QUATTRO,false,false
+resource-0374-tma,0374-TMA-,TMA,GEDRAGEN ROTATIEVE ROLLENMAAIER WB 240 cm,MAJOR,werktuig,MJ 70-240 CM rOLLER MAAIER,false,false
+resource-0372-kmb,0372-KMB,KMB,HANDMAAIER SABO 54 VARIO,Sabo,werktuig,Grasmaaier Sabo 54 Vario,false,false
+resource-0371-vgo,0371-VGO-,VGO,GATOR 855D 4X4,JOHN DEERE,voertuig,GATOR XUV 855 D 4X4,false,false
+resource-0369-val,0369-VAL-,VAL,AANHANGWAGEN,DELVAN,aanhanger,Aanhangwagen + afdekzeil,false,false
+resource-0359-whm,0359-WHM-,WHM,HEFTRUCK ACCU 2 TON,TOYOTA,machine,Forklift,false,false
+resource-0355-trc,0355-TRC-,TRC,BUNKERREAKE GROOMMASTER,JACOBSEN,machine,BUNKERREEK,false,false
+resource-0347-trc,0347-TRC-,TRC,COMPAKT TRAKTOR 50PK BOOMER,NEW HOLLAND,machine,BOOMER 50 HST,false,false
+resource-0344-trc,0344-TRC-,TRC,COMPAKT TRAKTOR 3720 + CAB,JOHN DEERE,machine,3720 HST+CAB,false,false
+resource-0343-tdu,0343-TDU-,TDU,ZOCON KIPPER 4.5 TON,ZOCON,voertuig,ZOCON KIPPER 4.5 TON,false,false
+resource-0340-mc5,0340-MC5-,MC5,5 Delige cylindermaaier 350 cm werkbreedte jumbo,JOHN DEERE,werktuig,1905 4WD,false,false
+resource-0338-vcb,0338-VCB-,VCB,Gesloten camionet B,FIAT,voertuig,"DUCATO MY 40 L-H 3,0 180 E5",false,false
+resource-0337-trc,0337-TRC-,TRC,COMPAKT TRAKTOR 3720 + FL,JOHN DEERE,machine,3720 HST+FL,false,false
+resource-0331-kmt,0331-KMT-,KMT,BOSMAAIER,,werktuig,,false,false
+resource-0330-kme,0330-KME-,KME,ELEKTRICHE HAMER PKX7 PLUS TOEBEHOREN,DUSS,machine,PKX7,false,false
+resource-0327-trb,0327-TRB-,TRB,AHLMAN LADER AZ45 V8,AHLMAN,machine,AZ45e ZWENKLADER,false,false
+resource-0324-tdo,0324-TDO-,TDO,GEDRAGEN DOORZAAIMACHINE BLEC,BLEC,machine,MULTI SEEDER,false,false
+resource-0323-kmd,0323-KMD-,KMD,MOTOCULTEUR 150 MD 190AE,VALPANDA BLITZ,machine,KMD04,false,false
+resource-0322-vgo,0322-VGO-,VGO,GATOR 6X4 DIESEL GAZONBANDEN,JOHN DEERE,voertuig,JDGA 6X4D,false,false
+resource-0320-trc,0320-TRC-,TRC,COMPAKT TRAKTOR 3720,JOHN DEERE,machine,3720 HST,false,false
+resource-0318-vcc,0318-VCC-,VCC,Gesloten camionet C MICHEL,FIAT,voertuig,"NEW DUCATO 40 L-LH2 3,0 JTD",false,false
+resource-0317-tal,0317-TAL-,TAL,BLADBLAZER WIEDENMANN WHISOER TWISTER,WIEDENMANN,machine,WHISOER TWISTER,false,false
+resource-0316-trs,0316-TRS-,TRS,SMALSPOORTRAKTOR 4X4 95PK + FL V21,NEW HOLLAND,machine,T4050 F 300 07 +frontlift,false,false
+resource-0315-tal,0315-TAL-,TAL,TRANSPORTBAK TBL 180,,werktuig,Transportbak TBL 180,false,false
+resource-0309-trw,0309-TRW-,TRW,3 DELIGE MOTORWEL JACOBSEN,Van de woestijne,machine,TRW08-jacobsen,false,false
+resource-0308-trs,0308-TRS-,TRS,SMALSPOORTREKKER 4X4 95PK + FL V20,NEW HOLLAND,machine,T4050F + frontlift,false,false
+resource-0307-trs,0307-TRS-,TRS,SMALSPOORTREKKER + SPROEIER,STEYER,machine,STEYR COMPACT 4075,false,false
+resource-0306-trb,0306-TRB-,TRB,WEIDEMAN WIELLADER 1250CX35 V7,WEIDEMANN,machine,1250CX35,false,false
+resource-0305-tal,0305-TAL-,TAL,AGRATOR FREES WB 210,AGRATOR,werktuig,TMA44 Type AR2100 AGRATOR FREES,false,false
+resource-0304-mc5,0304-MC5-,MC5,5 Delige cylindermaaier 350 cm werkbreedte,JOHN DEERE,werktuig,1905 4WD,false,false
+resource-0303-mc5,0303-MC5-,MC5,5 Delige cylindermaaier 350 cm werkbreedte,JOHN DEERE,werktuig,1905 4WD,false,false
+resource-0294-tdo,0294-TDO-,TDO,GEDRAGEN DOORZAAIMACHINE VREDO DZ SPORT,VREDO,machine,VREDO DOORZAAIMACHINE,false,false
+resource-0291-mc3,0291-MC3-,MC3,3 Delige cylindermaaier TR3 180 cm werkbreedte met opvangbakken TR3,JACOBSEN,werktuig,TR 3,false,false
+resource-0290-mc5-g,0290-MC5 G-,MC5,GOLF 5 Delige fairway cylindermaaier met groomers,JACOBSON,werktuig,LF3800 5,false,false
+resource-0289-mc3,0289-MC3-,MC3,Greensplex 3 Delige green maaier met groomers en opvangbakken,JACOBSON,werktuig,GREENPLEX,false,false
+resource-0288-whm,0288-WHM-,WHM,HEFTRUCK DIESEL TCM,TCM,machine,FD25 Z1,false,false
+resource-0282-whm,0282-WHM-,WHM,hogedrukreiniger dibo,dibo,machine,Levering HD reiniger,false,false
+resource-0280-trw,0280-TRW-,TRW,3 DELIGE MOTORWEL JACOBSEN,Van de woestijne,machine,TRW06-jacobsen,false,false
+resource-0279-trs,0279-TRS-,TRS,SMALSPOORTRAKTOR 4X4 95PK + FL V18,NEW HOLLAND,machine,TNF95FA + frontlift,false,false
+resource-0277-tsl,0277-TSL-,TSL,SLEEP GKB GEDRAAIDE BAREN,GKB,machine,Sleepraam,false,false
+resource-0275-tal,0275-TAL-,TAL,KORO TOPFIELDMAKER FREES EN OF VERTICUTEERDER WB200,KORO,werktuig,FTM2000,false,false
+resource-0273-tdu,0273-TDU-,TDU,DAKOTA BEZANDINGSWAGEN Turf 414,DAKOTA,voertuig,DAKOTA 414,false,false
+resource-0272-tdu,0272-TDU-,TDU,DAKOTA BEZANDINGSWAGEN Turf 420,DAKOTA,voertuig,BEZANDINGSWAGEN DAKOTA 420,false,false
+resource-0268-mr3,0268-MR3-,MR3,3 Delige rotatieve maaier 260 cm werkbreedte,RANSOMES,werktuig,HR6010,false,false
+resource-0267-mc3,0267-MC3-,MC3,3 Delige cylindermaaier TR3 WB 180 met opvangbakken,JACOBSEN,werktuig,TR 3,false,false
+resource-0266-mc5,0266-MC5-,MC5,5 Delige cylindermaaier 350 cm werkbreedte,JOHN DEERE,werktuig,1905 4WD,false,false
+resource-0263-kmb,0263-KMB-,KMB,BILLY GOAT VERTICUTEERDER 50,BILLY GOAT,machine,VERTICUT PRO 50CM,false,false
+resource-0258-kmb,0258 KMB,KMB,Bladblazer 4-mix,STIHL,machine,BR 550,false,false
+resource-0256-vco,0256-VCO-,VCO,CONTAINER MULTILIFT H80 L600,,machine,VCO06 CONTAINER H80,false,false
+resource-0254-trw,0254-TRW-,TRW,Bomag BW120AD TRILWALS,BOMAG,werktuig,BW 120 AD,false,false
+resource-0253-trw,0253-TRW-,TRW,3 DELIGE MOTORWEL JACOBSEN,Van de woestijne,machine,TRW05-jacobsen,false,false
+resource-0252-trs,0252-TRS-,TRS,SMALSPOORTRAKTOR 4X4 95PK + FL V16,NEW HOLLAND,machine,TNF95 + frontlift,false,false
+resource-0251-trs,0251-TRS-,TRS,SMALSPOORTRAKTOR 4X4 95PK + FL V15,NEW HOLLAND,machine,TNF95 + frontlift,false,false
+resource-0249-tsl,0249-TSL-,TSL,UITVLAKSLEEP 440 CM V36,EIGEN CONSTRUCTIE,machine,,false,false
+resource-0248-tsl,0248-TSL-,TSL,SLEEP 260CM MET ROL 30CM V33,EIGEN CONSTRUCTIE,machine,,false,false
+resource-0247-tsl,0247-TSL-,TSL,SLEEP 260 CM MET ROL 30CM V32,EIGEN CONSTRUCTIE,machine,,false,false
+resource-0246-mc5,0246-MC5-,MC5,5 Delige cylindermaaier 350 cm werkbreedte,JOHN DEERE,werktuig,1905 4WD,false,false
+resource-0237-vgo,0237-VGO-,VGO,TORO WORKMAN BEZANDER,TORO,voertuig,WORKMAN,false,false
+resource-0235-tsl,0235-TSL-,TSL,SLEEP 260 CM MET ROL 30CM V27,EIGEN CONSTRUCTIE,machine,,false,false
+resource-0234-mc5,0234-MC5-,MC5,5 Delige cylindermaaier 350 cm werkbreedte,JOHN DEERE,werktuig,1905 4WD,false,false
+resource-0226-tal,0226-TAL-,TAL,borstel-veertand combi KUNSTGRAS,EIGEN MAKELIJ,machine,SLEEP BORSTEL,false,false
+resource-0222-vaz,0222-VAZ-,VAZ,DIEPLADER 1 ASSIG 10 TON,GHEYSEN VERPOORT,aanhanger,KIPDIEPLADER 10 TON,false,false
+resource-0220-trb,0220-TRB-,TRB,AHLMAN WIELLADER AZ45e V5,AHLMANN,machine,AZ45e,false,false
+resource-0219-tdu,0219-TDU-,TDU,DUMPER AANHANGWAGEN OP LAGEDRUK BANDEN 10 TON,RECORD KIPWAGEN 10T,voertuig,TMA25 S100L,false,false
+resource-0217-tma,0217-TMA-,TMA,KLEPELMAAIER PERFECT ZW -210 CM,PERFECT,werktuig,KLEPEL MAAIER GRACHTEN,false,false
+resource-0216-trc,0216-TRC,TRC,RANSOMES KANTENMAAIER,RANSOMES,werktuig,COMMANDER 3520,false,false
+resource-0215-mc5,0215-MC5-,MC5,5 Delige cylindermaaier 350 cm werkbreedte,JOHN DEERE,werktuig,1905 4WD,false,false
+resource-0208-trw,0208 TRW,TRW,MOTORWEL PASQUALI,PASQUALI,machine,TRW04,false,false
+resource-0207-tsl,0207-TSL-,TSL,UITVLAKSLEEP 400 CM V26,EIGEN CONSTRUCTIE,machine,,false,false
+resource-0206-tsl,0206-TSL-,TSL,SLEEP 260CM MET ROL 30CM V24,EIGEN CONSTRUCTIE,machine,,false,false
+resource-0205-tal,0205-TAL-,TAL,DIEPWOELER,EVERS,machine,TMA10 DIEPWOELER EVERS WB275,false,false
+resource-0200-tal,0200-TAL-,TAL,ROTOREG LEMKEN ZIRKON + VERKRUIMELAAR,LEMKEN,machine,ROTOREG ZWAAR,false,false
+resource-0193-trw,0193-TRW-,TRW,3 DELIGE MOTORWEL SABO,SABO,machine,TRW03 SABO,false,false
+resource-0191-tve,0191-TVE-,TVE,MUSTANG VERTIDRAIN 7117 WD15 WB170,VERTIDRAIN,machine,TMV08 7117,false,false
+resource-0190-tdu,0190-TDU-,TDU,DUMPER AANHANGWAGEN OP LAGEDRUK BANDEN TANDEM 24 TON,RECORD KIPWAGEN 26T,voertuig,DUMPER 26T,false,false
+resource-0183-whm,0183-WHM-,WHM,KOLOMBOORMACHINE ATELIER,PKD,machine,Boormachine PKD VS 32 B,false,false
+resource-0182-whm,0182-WHM-,WHM,METAALLINTZAAG ATELIER PKD,PHOENIX,machine,FMB Lintzaagmachine Phoenix,false,false
+resource-0181-vcb,0181-VCB-,VCB,OPEN CAMIONET SPRINTER B,MERCEDES,voertuig,413 CDI OPEN LAADBAK,false,false
+resource-0177-tve,0177-TVE-,TVE,VERTIDRAIN 7316 WD30 WB160,VERTIDRAIN,machine,7316 160/30,false,false
+resource-0171-whm,0171-WHM-,WHM,4 PALENHEFBRUG ATELIER 4.5T,KONI,machine,WHM11 4 PALENBRUG ATELIER 4.5T,false,false
+resource-0170-vvc,0170-VVC-,VVC,VOLVO CONTAINER VRACHTAGEN C,VOLVO,voertuig,FM12 6x2,false,false
+resource-0169-vaz,0169-VAZ-,VAZ,SEMIDIEPLADER 26TON,GHEYSEN VERPOORT,aanhanger,VAZ05 OPLIGGER DIEPLADER,false,false
+resource-0168-trc,0168-TRC-,TRC,COMPAKT TRAKTOR 38 PK,NEW HOLLAND,machine,TRC03 FORD 1920 VERSMALT,false,false
+resource-0161-kmb,0161-KMB-,KMB,TRILPLAAT REVO,HONDA,werktuig,KMB TRILPLAAT,false,false
+resource-0157-whm,0157-WHM-,WHM,BANDSCHUURMACHINE ATELIER,,machine,WHM097 BANDSCHUURM. BG 752,false,false
+resource-0156-whm,0156-WHM-,WHM,SLIJPMOLEN ATELIER,OERTZEN,machine,WHM08 SLIJPMOLEN ATELIER,false,false
+resource-0149-tsp,0149-TSP-,TSP,SPROEIVAT 400L HARDY MET 6M BOOM,HARDI,machine,HARDI 400L MET 6M BOOM EN 2 HASPELS,false,false
+resource-0148-tsp,0148-TSP-,TSP,SPROEIVAT 800L MET HYDR. BOOM 12M,HARDI,machine,TMS02 HARDI 800L HYD 12M B,false,false
+resource-0143-has,0143-HAS-,HAS,BEREGENINGSHASPEL 50/160 + 100 M DARM V3,RAINBOY,machine,HASPEL 50/160,false,false
+resource-0141-tza,0141-TZA-,TZA,ROTOREG MET KOOIROL + DRIEPUNTSZAAIMACHINE WB220 HUMA,SICMA,machine,ER2000 F715-722,false,false
+resource-0135-whm,0135-WHM-,WHM,WARMELUCHTBLAZER ATELIER,,machine,WHM04 WARMELUCHTBLAZER,false,false
+resource-0131-tma,0131-TMA-,TMA,PANDA KLEPELMAAIER MET OPVANG WB180 3M3,SCHEPERS,werktuig,TMA16 PANDA,false,false
+resource-0128-mr1,0128-MR1-,MR1,Rottatieve frontmaaier werkbreedte 180 cm,ROBERINE,werktuig,1500 SABO 2WD,false,false
+resource-0124-val,0124-VAL-,VAL,AANHANGWAGEN 500KG + HUIF,DELVAN,aanhanger,ANONIEM MET HUIF OVERKAPPING,false,false
+resource-0123-val,0123-VAL-,VAL,AANHANGWAGEN 500KG,DELVAN,aanhanger,VAL01 ANONIEM,false,false
+resource-0121-tve,0121-TVE-,TVE,VERTIDRAIN 7316 WB 160CM DIEPTE 30 CM,VERTIDRAIN,machine,7316,false,false
+resource-0120-tdu,0120-TDU-,TDU,KIPWAGEN OP GAZONBANDEN 6 TON,JOSKIN 6 TON,voertuig,TMA01KIPWAGEN JOSKIN 6 TON,false,false
+resource-0110-tal,0110-TAL-,TAL,VEEGBORSTEL STH WB 180 2 M2,SCHEPERS,machine,TMA22 SCHEPERS T180 STH,false,false
+resource-0108-tal,0108-TAL-,TAL,VEEGMACHINE IN DERDEPUNT WB 185,BEMA,machine,TMA11 BEMA VEEGMACHIEN,false,false
+resource-0100-has,0100-HAS-,HAS,BEREGENINGSHASPEL 50/160 + 100 M DARM V2,RAINBOY,machine,HASPEL 50/160,false,false
+resource-0099-has,0099-HAS-,HAS,BEREGENINGSHASPEL 55/110+ 100 M DARM,RAINBOY,machine,HASPEL 55-110,false,false
+resource-0097-tza,0097-TZA-,TZA,ZAAIMACHINE MET PAKKERROL WB 180,LAND PRIDE,machine,TMZ03 LAND PRIDE ZAAIMACHINE,false,false
+resource-0087-has,0087-HAS-,HAS,BEREGENINGSHASPEL+DRAAIKRANS 60/210 + 100 DARM,RAINBOY,machine,RAINSTAR 65/250,false,false
+resource-0086-has,0086-HAS-,HAS,BEREGENINGSHASPEL 50/160 + 100 M DARM V5,RAINBOY,machine,HAS06 HASPEL 50/160,false,false
+resource-0085-has,0085-HAS-,HAS,BEREGENINGSHASPEL 50/160 + 100 M DARM V5,RAINBOY,machine,HASPEL 50/160,false,false
+resource-0084-has,0084-HAS-,HAS,BEREGENINGSHASPEL 50/160 + 100 M DARM,RAINBOY,machine,HASPEL 50/160,false,false
+resource-0080-vco,0080-VCO-,VCO,CONTAINER MULTILIFT H100 L600,,machine,CONTAINER H100,false,false
+resource-0079-vco,0079-VCO-,VCO,CONTAINER MULTILIFT H75 L700,,machine,SCHOVEN CONTAINER,false,false
+resource-0078-vco,0078-VCO-,VCO,CONTAINER MULTILIFT H125 L600,,machine,CONTAINER H125,false,false
+resource-0066-tal,0066-TAL-,TAL,Machine borstel voor kunstgras driepunts,,machine,Swinging Axle +Hitch F Tract,false,false
+resource-0065-kmb,0065-KMB-,KMB,Dennis maaier voor stadion,DENNIS,werktuig,2 GRASBOX STANDARD DENNIS,false,false
+resource-0064-kmb,0064-KMB-,KMB,Dennis maaier voor stadion,DENNIS,werktuig,2 GRASBOX STANDARD DENNIS,false,false
+resource-0064-hst,0064-HST,HST,Murush multi dense casset borstel,,machine,Murush multi dence,false,false
+resource-0063-whm,0063-WHM-,WHM,Laspost half automaat,,voertuig,Synergic Pro,false,false
+resource-0062-kmb,0062-KMB-,KMB,Handmaaier honda,,werktuig,Honda HRH536 K4,false,false
+resource-0059-tal,0059-TAL-,TAL,Kunstgrasborstel met opvangbak en zeef,Weideman,werktuig,Machine borstel voor kunstgras,false,false
+resource-0054-kme,0054-KME-,KME,VERSTEKZAAG DEWALT,Dewalt,machine,Verstekzaag,false,false
+resource-0051-vco,0051-VCO-,VCO,CONTAINER MULTILIFT H200 L600,,machine,CONTAINER H200,false,false
+resource-0040-tve,0040-TVE-,TVE,SCHUDFREES IEMANTS,IEMANTS,werktuig,SCHUDFREES ZWAAR MODEL,false,false
+resource-0024-tal,0024-TAL-,TAL,KARDAN WATERPOMP,BOUWER,machine,Pomp DPV,false,false
+resource-0014-las,0014-LAS-,LAS,HELLINGSLASER + ONTVANGER,,machine,Dual grade PKG Benelux,false,false
+resource-0012-bwi,0012-BWI-,BWI,TRANSCUBE 3000L,,machine,Transcube 3000 l,false,false
+resource-0011-bwi,0011-BWI-,BWI,ADR WERF TANK 3000L,,machine,ADR werfbrandstoftank Type 30 TCG,false,false
+resource-0007-whm,0007 WHM*,WHM,Plaatsen Wieshaupt condenserend gastoestel,,werktuig,,false,false
+resource-0005-tdu,0005-TDU-,TDU,Tweedehands gronddumper,,machine,DUMPER KAR,false,false
+resource-0003-bwi,0003-BWI-,BWI,Schaftwagen,,voertuig,Schaftwagen,false,false
+resource-0001-whm,0001-WHM-,WHM,2 TANKBALMORAL + POMP,,machine,DUBBELWANDIG 2X 5000 LITER,false,false

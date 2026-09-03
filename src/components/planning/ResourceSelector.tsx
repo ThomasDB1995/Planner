@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   filterResources,
   getResourceCategories,
@@ -16,6 +16,8 @@ import type { Resource } from "@/types/planning";
 type ResourceSelectorProps = {
   resources: Resource[];
   selectedResourceIds: string[];
+  isLoading?: boolean;
+  hasLoadError?: boolean;
   onChange: (resourceIds: string[]) => void;
 };
 
@@ -26,6 +28,8 @@ function formatCategory(category: Resource["category"]): string {
 export function ResourceSelector({
   resources,
   selectedResourceIds,
+  isLoading = false,
+  hasLoadError = false,
   onChange
 }: ResourceSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,11 +69,24 @@ export function ResourceSelector({
           .join("\n")
       : "Geen materieel gekozen";
   const selectedSummaryLabel =
-    selectedResources.length === 0
+    isLoading
+      ? "Materieel laden..."
+      : hasLoadError
+        ? "Materieel niet geladen"
+        : selectedResources.length === 0
       ? "Geen materieel gekozen"
       : selectedResources.length === 1
         ? selectedResources[0].name
         : `${selectedResources.length} materieelitems gekozen`;
+  const selectorIsUnavailable = isLoading || hasLoadError;
+
+  useEffect(() => {
+    setFavoriteResourceIds(
+      resources
+        .filter((resource) => resource.isFavorite)
+        .map((resource) => resource.id)
+    );
+  }, [resources]);
 
   function toggleResource(resourceId: string) {
     if (selectedResourceIdSet.has(resourceId)) {
@@ -96,7 +113,7 @@ export function ResourceSelector({
 
   return (
     <div className="rounded-md border border-perceel-line bg-slate-50 px-2 py-1.5">
-      <div className="flex items-center justify-between gap-2.5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-2.5">
         <div className="min-w-0 flex-1">
           <p className="text-[10px] font-semibold uppercase text-slate-500">
             Materieel optioneel
@@ -125,7 +142,7 @@ export function ResourceSelector({
               ))
             ) : (
               <p className="truncate text-sm font-semibold text-slate-500">
-                Geen materieel gekozen
+                {selectedSummaryLabel}
               </p>
             )}
           </div>
@@ -133,7 +150,7 @@ export function ResourceSelector({
         <div className="flex shrink-0 items-center gap-1.5">
           {selectedResources.length > 0 ? (
             <button
-              className="rounded-md border border-perceel-line bg-white px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-perceel-soft"
+              className="flex-1 rounded-md border border-perceel-line bg-white px-2 py-1.5 text-xs font-semibold text-slate-600 hover:bg-perceel-soft sm:flex-none sm:py-1"
               onClick={clearResources}
               type="button"
             >
@@ -142,7 +159,8 @@ export function ResourceSelector({
           ) : null}
           <button
             aria-expanded={isOpen}
-            className="rounded-md border border-perceel-line bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-perceel-soft"
+            className="flex-1 rounded-md border border-perceel-line bg-white px-2 py-1.5 text-xs font-semibold text-slate-700 hover:bg-perceel-soft disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 sm:flex-none sm:py-1"
+            disabled={selectorIsUnavailable}
             onClick={() => setIsOpen((currentValue) => !currentValue)}
             type="button"
           >
@@ -169,7 +187,7 @@ export function ResourceSelector({
             </button>
           </div>
 
-          <div className="grid grid-cols-[minmax(160px,1fr)_120px_140px] gap-1.5">
+          <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-[minmax(160px,1fr)_120px_140px]">
             <label className="text-[10px] font-semibold uppercase text-slate-600">
               Zoek
               <input
@@ -216,7 +234,7 @@ export function ResourceSelector({
             </label>
           </div>
 
-          <div className="mt-1.5 max-h-24 overflow-y-auto rounded-md border border-perceel-line bg-white">
+          <div className="mt-1.5 max-h-64 overflow-y-auto rounded-md border border-perceel-line bg-white sm:max-h-28">
             {filteredResources.length === 0 ? (
               <p className="px-2 py-1 text-xs text-slate-600">
                 Geen materieel gevonden.
@@ -253,7 +271,7 @@ export function ResourceSelector({
                         {isFavorite ? "\u2605" : "\u2606"}
                       </button>
                       <button
-                        className="grid w-full grid-cols-[58px_minmax(120px,1fr)_70px_86px_110px] items-center gap-1.5 text-left text-xs"
+                        className="grid w-full grid-cols-[72px_minmax(0,1fr)_64px] items-center gap-1.5 text-left text-xs lg:grid-cols-[58px_minmax(120px,1fr)_70px_86px_110px]"
                         onClick={() => toggleResource(resource.id)}
                         type="button"
                       >
@@ -270,10 +288,10 @@ export function ResourceSelector({
                         >
                           {isSelected ? "Gekozen" : ""}
                         </span>
-                        <span className="truncate text-xs uppercase text-slate-600">
+                        <span className="hidden truncate text-xs uppercase text-slate-600 lg:block">
                           {resource.category}
                         </span>
-                        <span className="truncate text-xs text-slate-600">
+                        <span className="hidden truncate text-xs text-slate-600 lg:block">
                           {resource.type}
                         </span>
                       </button>

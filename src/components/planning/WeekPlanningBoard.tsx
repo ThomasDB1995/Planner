@@ -161,18 +161,18 @@ export function WeekPlanningBoard({
 
   return (
     <section>
-      <div className="mb-3 grid gap-3 lg:grid-cols-[minmax(180px,1fr)_auto_minmax(260px,1fr)] lg:items-start">
+      <div className="mb-3 grid gap-2 lg:grid-cols-[minmax(180px,1fr)_auto_minmax(260px,1fr)] lg:items-start">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase text-perceel-green">
             Weekplanning
           </p>
-          <h2 className="mt-1 text-xl font-bold text-perceel-dark">
+          <h2 className="mt-1 text-lg font-bold leading-6 text-perceel-dark sm:text-xl">
             Matrix per werknemer en dag
           </h2>
         </div>
         <div
           aria-label={`Week ${activeWeekNumber} ${activeWeekYear}, ${weekRangeLabel}`}
-          className="flex w-fit max-w-[520px] shrink-0 flex-col items-center gap-1 rounded-md border border-perceel-line bg-white px-2 py-1.5"
+          className="flex w-full max-w-none shrink-0 flex-col items-center gap-1 rounded-md border border-perceel-line bg-white px-2 py-1.5 sm:max-w-[520px] lg:w-fit"
         >
           <div className="flex items-center gap-2">
             <button
@@ -259,9 +259,9 @@ export function WeekPlanningBoard({
             </p>
           ) : null}
         </div>
-        <div className="flex min-h-[34px] flex-wrap items-center justify-end gap-2">
+        <div className="flex min-h-[34px] flex-wrap items-center justify-start gap-2 lg:justify-end">
           {selectedCell ? (
-            <div className="flex items-center gap-2">
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
               <button
                 className={`rounded-md border px-3 py-2 text-xs font-semibold ${
                   selectedCellAvailability
@@ -300,7 +300,7 @@ export function WeekPlanningBoard({
           ) : null}
           {canMoveSelectedCard ? (
             <button
-              className="rounded-md bg-perceel-green px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-800"
+              className="w-full rounded-md bg-perceel-green px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-800 sm:w-auto"
               data-action="move-selected-card"
               onClick={onMoveSelectedCard}
               type="button"
@@ -317,7 +317,7 @@ export function WeekPlanningBoard({
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-md border border-slate-300 bg-white">
+      <div className="overflow-x-auto overscroll-x-contain rounded-md border border-slate-300 bg-white shadow-sm">
         <WeekHeader days={days} />
         {employees.map((employee, index) => {
           const showCategorySeparator =
@@ -326,7 +326,7 @@ export function WeekPlanningBoard({
           return (
             <div key={employee.id}>
               {showCategorySeparator ? (
-                <div className="min-w-[1340px] border-b border-slate-300 bg-slate-200/85 px-2 py-1">
+                <div className="min-w-[1040px] border-b border-slate-300 bg-slate-200/85 px-2 py-1">
                   <div className="sticky left-0 z-20 w-fit rounded-sm bg-slate-200/95 pr-2 text-[10px] font-bold uppercase tracking-wide text-slate-600">
                     {employee.category}
                   </div>

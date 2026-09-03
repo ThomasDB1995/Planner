@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import type { Session } from "@supabase/supabase-js";
+import { useCallback, useEffect, useState } from "react";
 import { AuthGate } from "@/components/auth/AuthGate";
 import type {
   EmployeeAvailability,
@@ -10,7 +11,7 @@ import type {
 import { PlanningForm } from "@/components/planning/PlanningForm";
 import { WeekPlanningBoard } from "@/components/planning/WeekPlanningBoard";
 import { WorkCardPreview } from "@/components/planning/WorkCardPreview";
-import { employees, resources } from "@/data/seed";
+import { employees } from "@/data/employees";
 import type { AvailabilityType } from "@/lib/planning/availability";
 import {
   clearEmployeeAvailability,
@@ -35,10 +36,17 @@ import {
   getWorkWeek
 } from "@/lib/planning/week";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
-import type { PlanningItem } from "@/types/planning";
+import { fetchPlannerResources } from "@/lib/supabase/resources";
+import type { PlanningItem, Resource } from "@/types/planning";
+
+type ResourceLoadState = "idle" | "loading" | "ready" | "error";
 
 export default function Home() {
   const [plannerEmployees, setPlannerEmployees] = useState(() => employees);
+  const [authSession, setAuthSession] = useState<Session | null>(null);
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [resourceLoadState, setResourceLoadState] =
+    useState<ResourceLoadState>("idle");
   const [showHiddenEmployees, setShowHiddenEmployees] = useState(false);
   const [showWeekEmployeePanel, setShowWeekEmployeePanel] = useState(false);
   const [weekEmployeeToAddId, setWeekEmployeeToAddId] = useState("");
@@ -64,6 +72,16 @@ export default function Home() {
   >([]);
   const days = getWorkWeek(currentWeekStartDate);
   const hasSupabaseConnection = isSupabaseConfigured();
+  const resourceStatusLabel =
+    resourceLoadState === "ready"
+      ? `Supabase · ${resources.length} materieelitems`
+      : resourceLoadState === "loading"
+        ? "Supabase · materieel laden"
+        : resourceLoadState === "error"
+          ? "Supabase · materieel niet geladen"
+          : hasSupabaseConnection
+            ? "Supabase ingesteld"
+            : "Supabase niet ingesteld";
   const activeWeekKey = getIsoWeekKey(currentWeekStartDate);
   const activeWeeklyEmployeeIds = weeklyEmployeeIdsByWeek[activeWeekKey] ?? [];
   const visibleWeekDates = new Set(days.map((day) => day.date));
@@ -152,6 +170,44 @@ export default function Home() {
                 : "Kies een cel",
             tone: "create" as const
           };
+
+  const handleAuthSessionChange = useCallback((nextSession: Session | null) => {
+    setAuthSession(nextSession);
+  }, []);
+
+  useEffect(() => {
+    if (!hasSupabaseConnection || !authSession) {
+      setResources([]);
+      setResourceLoadState("idle");
+      return;
+    }
+
+    let isMounted = true;
+
+    setResourceLoadState("loading");
+
+    fetchPlannerResources()
+      .then((nextResources) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setResources(nextResources);
+        setResourceLoadState("ready");
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setResources([]);
+        setResourceLoadState("error");
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authSession, hasSupabaseConnection]);
 
   function addPlanningItem(item: Omit<PlanningItem, "id">) {
     setPlanningItems((currentItems) => [
@@ -413,28 +469,36 @@ export default function Home() {
   }
 
   return (
-    <AuthGate>
-    <main className="min-h-screen bg-perceel-soft px-6 py-4">
-      <section className="mx-auto max-w-[1500px]">
-        <p className="text-xs font-semibold uppercase text-perceel-green">
-          Perceel
-        </p>
-        <h1 className="mt-1 text-2xl font-bold text-perceel-dark">
-          Werkplanning & Materieelbeheer
-        </h1>
-        <p className="mt-1 max-w-3xl text-sm leading-5 text-slate-700">
-          Weekplanning van maandag tot zondag per werknemer met optioneel materieel en
-          conflictwaarschuwingen.
-        </p>
-        <p className="mt-1 text-xs font-semibold text-slate-500">
-          Datalaag: {hasSupabaseConnection ? "Supabase ingesteld" : "lokaal"}
-        </p>
+    <AuthGate onSessionChange={handleAuthSessionChange}>
+      <main className="min-h-screen bg-perceel-soft px-3 pb-5 pt-16 sm:px-5 sm:py-4 lg:px-6">
+        <section className="mx-auto max-w-[1500px]">
+          <header className="rounded-md border border-perceel-line bg-white/90 px-3 py-3 shadow-sm sm:px-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase text-perceel-green">
+                  Perceel
+                </p>
+                <h1 className="mt-1 text-xl font-bold leading-7 text-perceel-dark sm:text-2xl">
+                  Werkplanning & Materieelbeheer
+                </h1>
+                <p className="mt-1 max-w-3xl text-sm leading-5 text-slate-700">
+                  Weekplanning van maandag tot zondag per werknemer met
+                  optioneel materieel en conflictwaarschuwingen.
+                </p>
+              </div>
+              <p className="w-fit rounded border border-emerald-100 bg-emerald-50 px-2 py-1 text-xs font-semibold text-slate-600">
+                Datalaag: {resourceStatusLabel}
+              </p>
+            </div>
+          </header>
 
         <div className="mt-3 space-y-3">
           <PlanningForm
             actionContext={actionContext}
             employees={visibleEmployees}
             resources={resources}
+            resourcesAreLoading={resourceLoadState === "loading"}
+            resourcesLoadError={resourceLoadState === "error"}
             editingItem={editingPlanningItem}
             key={currentWeekStartDate}
             onCreate={addPlanningItem}
@@ -442,12 +506,12 @@ export default function Home() {
             selectedCell={selectedCell}
           />
 
-          <div className="rounded-md border border-perceel-line bg-white px-3 py-1.5 text-xs">
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="rounded-md border border-perceel-line bg-white px-3 py-2 text-xs shadow-sm">
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
               <span className="font-semibold text-slate-600">Werknemers</span>
               <button
                 aria-expanded={showWeekEmployeePanel}
-                className="rounded border border-slate-200 bg-slate-50 px-2 py-1 font-semibold text-slate-600 hover:bg-white hover:text-perceel-dark"
+                className="w-full rounded border border-slate-200 bg-slate-50 px-2 py-1.5 text-left font-semibold text-slate-600 hover:bg-white hover:text-perceel-dark sm:w-auto sm:text-center"
                 onClick={() => {
                   setShowWeekEmployeePanel((currentValue) => !currentValue);
                   setWeekEmployeeToAddId("");
@@ -486,8 +550,8 @@ export default function Home() {
               <div className="mt-1.5 space-y-1.5 border-t border-slate-100 pt-1.5">
                 {showWeekEmployeePanel ? (
                   <div className="space-y-1.5">
-                    <div className="flex flex-wrap items-end gap-2">
-                      <label className="min-w-[260px] font-semibold text-slate-600">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end">
+                      <label className="w-full font-semibold text-slate-600 sm:min-w-[260px] sm:w-auto">
                         Werknemer
                         <select
                           className="mt-1 h-[30px] w-full rounded-md border border-perceel-line px-2 text-sm font-normal text-slate-800"
@@ -510,7 +574,7 @@ export default function Home() {
                         </select>
                       </label>
                       <button
-                        className="h-[30px] rounded-md border border-perceel-green bg-white px-3 text-xs font-semibold text-perceel-green hover:bg-emerald-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400 disabled:hover:bg-white"
+                        className="h-[34px] rounded-md border border-perceel-green bg-white px-3 text-xs font-semibold text-perceel-green hover:bg-emerald-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400 disabled:hover:bg-white sm:h-[30px]"
                         disabled={!selectedWeekEmployeeToAdd}
                         onClick={() =>
                           addEmployeeToActiveWeek(
@@ -622,8 +686,8 @@ export default function Home() {
             weeklyEmployeeIds={activeWeeklyEmployeeIds}
           />
         </div>
-      </section>
-    </main>
+        </section>
+      </main>
     </AuthGate>
   );
 }
