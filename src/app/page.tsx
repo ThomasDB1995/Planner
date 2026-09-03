@@ -1067,48 +1067,32 @@ export default function Home() {
     <AuthGate onSessionChange={handleAuthSessionChange}>
       <main className="min-h-screen bg-perceel-soft px-3 pb-5 pt-16 sm:px-5 sm:py-4 lg:px-6">
         <section className="mx-auto max-w-[1500px]">
-          <header className="rounded-md border border-perceel-line bg-white/90 px-3 py-3 shadow-sm sm:px-4">
-            <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
-              <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase text-perceel-green">
-                  Perceel
-                </p>
-                <h1 className="mt-1 text-xl font-bold leading-7 text-perceel-dark sm:text-2xl">
-                  Werkplanning & Materieelbeheer
-                </h1>
-                <p className="mt-1 max-w-3xl text-sm leading-5 text-slate-700">
-                  Weekplanning van maandag tot zondag per werknemer met
-                  optioneel materieel en conflictwaarschuwingen.
-                </p>
-              </div>
-              <div className="flex max-w-full flex-wrap gap-2 lg:justify-end">
-                <button
-                  className={`rounded-md border px-4 py-2 text-sm font-bold shadow-sm ${
-                    !isPlannerEditMode
-                      ? "border-perceel-green bg-perceel-green text-white"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
-                  }`}
-                  onClick={() => switchPlannerMode(false)}
-                  type="button"
-                >
-                  Bekijken
-                </button>
-                <button
-                  className={`rounded-md border px-4 py-2 text-sm font-bold shadow-sm ${
-                    isPlannerEditMode
-                      ? "border-perceel-green bg-perceel-green text-white"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
-                  }`}
-                  onClick={() => switchPlannerMode(true)}
-                  type="button"
-                >
-                  Bewerken
-                </button>
-              </div>
-            </div>
-          </header>
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
+            <button
+              className={`rounded-md border px-4 py-2.5 text-sm font-bold shadow-sm sm:min-w-[112px] ${
+                !isPlannerEditMode
+                  ? "border-perceel-green bg-perceel-green text-white"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
+              }`}
+              onClick={() => switchPlannerMode(false)}
+              type="button"
+            >
+              Bekijken
+            </button>
+            <button
+              className={`rounded-md border px-4 py-2.5 text-sm font-bold shadow-sm sm:min-w-[112px] ${
+                isPlannerEditMode
+                  ? "border-perceel-green bg-perceel-green text-white"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
+              }`}
+              onClick={() => switchPlannerMode(true)}
+              type="button"
+            >
+              Bewerken
+            </button>
+          </div>
 
-        <div className="mt-3 space-y-3">
+        <div className="mt-2 space-y-3">
           {planningSaveError ? (
             <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">
               {planningSaveError}
