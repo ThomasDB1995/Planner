@@ -332,7 +332,7 @@ export function WeekPlanningBoard({
         </div>
       </div>
 
-      <div className="overflow-x-auto overscroll-x-contain rounded-md border border-slate-300 bg-white shadow-sm">
+      <div className="snap-x snap-mandatory scroll-pl-[116px] overflow-x-auto overscroll-x-contain rounded-md border border-slate-300 bg-white shadow-sm sm:snap-none sm:scroll-pl-0">
         <WeekHeader days={days} />
         {employees.map((employee, index) => {
           const showCategorySeparator =
@@ -342,7 +342,7 @@ export function WeekPlanningBoard({
             <div key={employee.id}>
               {showCategorySeparator ? (
                 <div className="min-w-[calc(116px+7*(100vw-152px))] border-b border-slate-300 bg-slate-200/85 px-2 py-1 sm:min-w-[920px] lg:min-w-[1040px]">
-                  <div className="sticky left-0 z-20 w-fit rounded-sm bg-slate-200/95 pr-2 text-[10px] font-bold uppercase tracking-wide text-slate-600">
+                  <div className="sticky left-0 z-30 w-fit rounded-sm bg-slate-200 pr-2 text-[10px] font-bold uppercase tracking-wide text-slate-600">
                     {employee.category}
                   </div>
                 </div>
