@@ -1,7 +1,7 @@
 "use client";
 
 import type { Session } from "@supabase/supabase-js";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AuthGate } from "@/components/auth/AuthGate";
 import type {
   EmployeeAvailability,
@@ -37,11 +37,39 @@ import {
 } from "@/lib/planning/week";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { fetchPlannerEmployees } from "@/lib/supabase/employees";
+import {
+  createPlannerPlanningItem,
+  deletePlannerPlanningItem,
+  fetchPlannerPlanningItemsForDateRange,
+  updatePlannerPlanningItem
+} from "@/lib/supabase/planning-items";
 import { fetchPlannerResources } from "@/lib/supabase/resources";
 import type { PlanningItem, Resource } from "@/types/planning";
 
 type ResourceLoadState = "idle" | "loading" | "ready" | "error";
 type EmployeeLoadState = "idle" | "loading" | "ready" | "error";
+type PlanningItemsLoadState = "idle" | "loading" | "ready" | "error";
+
+function mergePlanningItemsForDates(
+  currentItems: PlanningItem[],
+  nextItems: PlanningItem[],
+  dates: string[]
+): PlanningItem[] {
+  const dateSet = new Set(dates);
+
+  return [
+    ...currentItems.filter((item) => !dateSet.has(item.date)),
+    ...nextItems
+  ];
+}
+
+function createPlanningItemId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return `planning-${crypto.randomUUID()}`;
+  }
+
+  return `planning-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
 
 export default function Home() {
   const [plannerEmployees, setPlannerEmployees] = useState(() => employees);
@@ -51,6 +79,12 @@ export default function Home() {
     useState<ResourceLoadState>("idle");
   const [employeeLoadState, setEmployeeLoadState] =
     useState<EmployeeLoadState>("idle");
+  const [planningItemsLoadState, setPlanningItemsLoadState] =
+    useState<PlanningItemsLoadState>("idle");
+  const [planningSaveError, setPlanningSaveError] = useState("");
+  const planningItemSaveTimeoutsRef = useRef<
+    Record<string, ReturnType<typeof setTimeout>>
+  >({});
   const [showHiddenEmployees, setShowHiddenEmployees] = useState(false);
   const [showWeekEmployeePanel, setShowWeekEmployeePanel] = useState(false);
   const [weekEmployeeToAddId, setWeekEmployeeToAddId] = useState("");
@@ -94,6 +128,16 @@ export default function Home() {
         : employeeLoadState === "error"
           ? "werknemers fallback"
           : `${plannerEmployees.length} werknemers`;
+  const planningStatusLabel =
+    planningItemsLoadState === "ready"
+      ? "planning opgeslagen"
+      : planningItemsLoadState === "loading"
+        ? "planning laden"
+        : planningItemsLoadState === "error"
+          ? "planning niet geladen"
+          : hasSupabaseConnection
+            ? "planning klaar"
+            : "planning lokaal";
   const activeWeekKey = getIsoWeekKey(currentWeekStartDate);
   const activeWeeklyEmployeeIds = weeklyEmployeeIdsByWeek[activeWeekKey] ?? [];
   const visibleWeekDates = new Set(days.map((day) => day.date));
@@ -252,14 +296,119 @@ export default function Home() {
     };
   }, [authSession, hasSupabaseConnection]);
 
-  function addPlanningItem(item: Omit<PlanningItem, "id">) {
-    setPlanningItems((currentItems) => [
-      ...currentItems,
-      {
-        ...item,
-        id: `planning-${currentItems.length + 1}`
-      }
-    ]);
+  useEffect(() => {
+    if (!hasSupabaseConnection || !authSession || days.length === 0) {
+      setPlanningItemsLoadState("idle");
+      return;
+    }
+
+    let isMounted = true;
+    const startDate = days[0].date;
+    const endDate = days[days.length - 1].date;
+    const weekDates = days.map((day) => day.date);
+
+    setPlanningItemsLoadState("loading");
+
+    fetchPlannerPlanningItemsForDateRange(startDate, endDate)
+      .then((nextItems) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setPlanningItems((currentItems) =>
+          mergePlanningItemsForDates(currentItems, nextItems, weekDates)
+        );
+        setPlanningItemsLoadState("ready");
+        setPlanningSaveError("");
+      })
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+
+        setPlanningItemsLoadState("error");
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authSession, currentWeekStartDate, hasSupabaseConnection]);
+
+  useEffect(() => {
+    const pendingTimeouts = planningItemSaveTimeoutsRef.current;
+
+    return () => {
+      Object.values(pendingTimeouts).forEach(clearTimeout);
+    };
+  }, []);
+
+  function shouldPersistPlanningItems(): boolean {
+    return hasSupabaseConnection && Boolean(authSession);
+  }
+
+  function persistPlanningItemUpdate(item: PlanningItem, debounce = true) {
+    if (!shouldPersistPlanningItems()) {
+      return;
+    }
+
+    const persist = () => {
+      delete planningItemSaveTimeoutsRef.current[item.id];
+
+      updatePlannerPlanningItem(item)
+        .then((savedItem) => {
+          setPlanningItems((currentItems) =>
+            currentItems.map((currentItem) =>
+              currentItem.id === savedItem.id ? savedItem : currentItem
+            )
+          );
+          setPlanningSaveError("");
+        })
+        .catch(() => {
+          setPlanningSaveError(
+            "Planningwijziging niet opgeslagen. Herlaad niet voor je dit controleert."
+          );
+        });
+    };
+
+    clearTimeout(planningItemSaveTimeoutsRef.current[item.id]);
+
+    if (!debounce) {
+      persist();
+      return;
+    }
+
+    planningItemSaveTimeoutsRef.current[item.id] = setTimeout(persist, 500);
+  }
+
+  async function addPlanningItem(item: Omit<PlanningItem, "id">) {
+    const nextItem = {
+      ...item,
+      id: createPlanningItemId()
+    };
+
+    setPlanningItems((currentItems) => [...currentItems, nextItem]);
+    setPlanningSaveError("");
+
+    if (!shouldPersistPlanningItems()) {
+      return;
+    }
+
+    try {
+      const savedItem = await createPlannerPlanningItem(nextItem);
+
+      setPlanningItems((currentItems) =>
+        currentItems.map((currentItem) =>
+          currentItem.id === nextItem.id ? savedItem : currentItem
+        )
+      );
+    } catch {
+      setPlanningItems((currentItems) =>
+        currentItems.filter((currentItem) => currentItem.id !== nextItem.id)
+      );
+      setPlanningSaveError(
+        "Planningitem niet opgeslagen. Probeer opnieuw of controleer de verbinding."
+      );
+    }
   }
 
   function clearPlannerSelection() {
@@ -392,27 +541,35 @@ export default function Home() {
     planningItemId: string,
     updates: Partial<Pick<PlanningItem, "taskName" | "resourceIds">>
   ) {
+    const currentItem = planningItems.find((item) => item.id === planningItemId);
+
+    if (!currentItem) {
+      return;
+    }
+
+    const updatedItemBase = {
+      ...currentItem,
+      ...updates
+    };
+    const updatedItem =
+      "resourceIds" in updates
+        ? withPlanningItemResourceIds(updatedItemBase, updates.resourceIds)
+        : updatedItemBase;
+
     setPlanningItems((currentItems) =>
-      currentItems.map((item) => {
-        if (item.id !== planningItemId) {
-          return item;
-        }
-
-        const nextItem = {
-          ...item,
-          ...updates
-        };
-
-        if ("resourceIds" in updates) {
-          return withPlanningItemResourceIds(nextItem, updates.resourceIds);
-        }
-
-        return nextItem;
-      })
+      currentItems.map((item) =>
+        item.id === planningItemId ? updatedItem : item
+      )
     );
+    persistPlanningItemUpdate(updatedItem);
   }
 
-  function deletePlanningItem(planningItemId: string) {
+  async function deletePlanningItem(planningItemId: string) {
+    const deletedItem = planningItems.find((item) => item.id === planningItemId);
+
+    clearTimeout(planningItemSaveTimeoutsRef.current[planningItemId]);
+    delete planningItemSaveTimeoutsRef.current[planningItemId];
+
     setPlanningItems((currentItems) =>
       currentItems.filter((item) => item.id !== planningItemId)
     );
@@ -431,6 +588,20 @@ export default function Home() {
     setEditingPlanningItemId((currentEditingItemId) =>
       currentEditingItemId === planningItemId ? null : currentEditingItemId
     );
+
+    if (!deletedItem || !shouldPersistPlanningItems()) {
+      return;
+    }
+
+    try {
+      await deletePlannerPlanningItem(planningItemId);
+      setPlanningSaveError("");
+    } catch {
+      setPlanningItems((currentItems) => [...currentItems, deletedItem]);
+      setPlanningSaveError(
+        "Planningitem niet verwijderd in Supabase. Probeer opnieuw."
+      );
+    }
   }
 
   function selectPlanningCard(card: SelectedPlanningCard) {
@@ -495,17 +666,20 @@ export default function Home() {
       return;
     }
 
+    const movedItem = {
+      ...selectedPlanningItem,
+      employeeId: activeDestinationCell.employeeId,
+      date: activeDestinationCell.date
+    };
+
     setPlanningItems((currentItems) =>
       currentItems.map((item) =>
         item.id === activeRelocationCard.planningItemId
-          ? {
-              ...item,
-              employeeId: activeDestinationCell.employeeId,
-              date: activeDestinationCell.date
-            }
+          ? movedItem
           : item
       )
     );
+    persistPlanningItemUpdate(movedItem, false);
     setActiveDestinationCell(null);
     setRelocationSourceCard(null);
     setSelectedCard(null);
@@ -535,10 +709,19 @@ export default function Home() {
               <p className="w-fit rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-600">
                 Werknemers: {employeeStatusLabel}
               </p>
+              <p className="w-fit rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-600">
+                Planning: {planningStatusLabel}
+              </p>
             </div>
           </header>
 
         <div className="mt-3 space-y-3">
+          {planningSaveError ? (
+            <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">
+              {planningSaveError}
+            </p>
+          ) : null}
+
           <PlanningForm
             actionContext={actionContext}
             employees={visibleEmployees}

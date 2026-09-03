@@ -8,7 +8,7 @@ Status: Planner klaar voor praktijkgebruik met Supabase resources en werknemers
 
 ## Current Sprint
 
-Geen actieve implementatiesprint. Sprint 32 is afgerond en de zichtbare WorkCard structuurdemo is uit de dagelijkse planner verwijderd. WorkCard types, documentatie en backlog blijven behouden. Planner focust opnieuw op planning. Resources en werknemers worden na login uit Supabase gelezen; lokale planneracties zoals planningitems, availability, weektoevoegingen en hide/show blijven voorlopig in-memory.
+Geen actieve implementatiesprint. Sprint 32 is afgerond en de zichtbare WorkCard structuurdemo is uit de dagelijkse planner verwijderd. WorkCard types, documentatie en backlog blijven behouden. Planner focust opnieuw op planning. Resources en werknemers worden na login uit Supabase gelezen. Planningitems worden gedeeld opgeslagen in Supabase. Availability, weektoevoegingen, resource favorites en hide/show blijven voorlopig in-memory.
 
 ---
 
@@ -105,6 +105,14 @@ Geen actief implementatieticket. Sprint 32 T3201, T3202 en T3203 zijn afgerond e
 - Geen employee writes vanuit de app toegevoegd; lokaal toevoegen/verbergen/tonen en weektoevoegingen blijven in-memory
 - Geen HR-module, payroll, contractstatus, permissions of hard-delete gedrag toegevoegd
 - Build groen na Supabase employee catalog integratie
+- Supabase planning persistence toegevoegd
+- `public.planning_items` toegevoegd voor gedeelde planningitems
+- Planningitems worden per actieve maandag-zondag week uit Supabase geladen
+- Create, delete en relocation schrijven naar Supabase
+- Edit blijft direct lokaal en wordt kort gedebounced naar Supabase opgeslagen
+- PlanningItem contract blijft intact: `date`, `employeeId`, `taskName`, compatibel `resourceId` en additief `resourceIds`
+- Geen realtime-sync, werkbon, nacalculatie, workflow of approvalgedrag toegevoegd
+- Mobiele matrixbreedte versoepeld: vaste 1040px grid is vervangen door responsieve min-width stappen voor gsm/tablet/desktop
 - Sprint 30 Weekgebonden Werknemers afgerond
 - Matrix toont kernploeg plus werknemers tijdelijk toegevoegd aan actieve ISO-week
 - Dagelijkse UI gebruikt `+ Aan deze week toevoegen` en `Uit deze week`

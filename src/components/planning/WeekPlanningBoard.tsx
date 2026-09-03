@@ -326,7 +326,7 @@ export function WeekPlanningBoard({
           return (
             <div key={employee.id}>
               {showCategorySeparator ? (
-                <div className="min-w-[1040px] border-b border-slate-300 bg-slate-200/85 px-2 py-1">
+                <div className="min-w-[760px] border-b border-slate-300 bg-slate-200/85 px-2 py-1 sm:min-w-[920px] lg:min-w-[1040px]">
                   <div className="sticky left-0 z-20 w-fit rounded-sm bg-slate-200/95 pr-2 text-[10px] font-bold uppercase tracking-wide text-slate-600">
                     {employee.category}
                   </div>
