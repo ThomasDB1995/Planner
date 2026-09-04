@@ -201,11 +201,11 @@ export function PlanningForm({
             </span>
           </div>
         </div>
-        <div className="rounded-md border border-perceel-line bg-slate-50 px-2.5 py-1.5 text-left lg:min-w-[190px] lg:text-right">
-          <p className="text-[10px] font-semibold uppercase text-slate-500">
+        <div className="min-w-0 rounded-md border border-slate-100 bg-slate-50/70 px-2.5 py-1.5 text-left lg:max-w-[260px] lg:text-right">
+          <p className="text-[10px] font-semibold uppercase leading-3 text-slate-400">
             {isEditMode ? "Geselecteerde card" : "Actieve cel"}
           </p>
-          <p className="text-xs font-semibold text-perceel-dark">
+          <p className="truncate text-xs font-semibold text-slate-700">
             {isEditMode && editingItem && editingEmployee
               ? `${getEmployeeDisplayName(editingEmployee)} - ${
                   editingItem.date
@@ -219,11 +219,11 @@ export function PlanningForm({
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-1 gap-2.5 md:grid-cols-2 xl:grid-cols-[130px_145px_minmax(260px,1fr)_auto]">
+      <div className="mt-3 grid grid-cols-1 gap-2.5 md:grid-cols-[130px_145px_minmax(260px,1fr)]">
         <label className="text-xs font-semibold text-slate-700">
           Datum
           <input
-            className={`mt-1 h-9 w-full rounded-md border border-perceel-line px-2 py-1 text-sm xl:h-auto ${
+            className={`mt-1 h-9 w-full rounded-md border border-perceel-line px-2 py-1 text-sm ${
               isEditMode ? "bg-slate-100 text-slate-500" : ""
             }`}
             disabled={isEditMode}
@@ -236,7 +236,7 @@ export function PlanningForm({
         <label className="text-xs font-semibold text-slate-700">
           Werknemer
           <select
-            className={`mt-1 h-9 w-full rounded-md border border-perceel-line px-2 py-1 text-sm xl:h-auto ${
+            className={`mt-1 h-9 w-full rounded-md border border-perceel-line px-2 py-1 text-sm ${
               isEditMode ? "bg-slate-100 text-slate-500" : ""
             }`}
             disabled={isEditMode}
@@ -252,10 +252,10 @@ export function PlanningForm({
           </select>
         </label>
 
-        <label className="text-xs font-semibold text-slate-700 md:col-span-2 xl:col-span-1">
+        <label className="text-xs font-semibold text-slate-700">
           Taak/project
           <input
-            className="mt-1 h-9 w-full rounded-md border border-perceel-line px-2 py-1 text-sm xl:h-auto"
+            className="mt-1 h-9 w-full rounded-md border border-perceel-line px-2 py-1 text-sm"
             onBlur={onFlushPendingEdits}
             onChange={(event) => updateField("taskName", event.target.value)}
             onKeyDown={(event) => {
@@ -275,21 +275,6 @@ export function PlanningForm({
             value={formState.taskName}
           />
         </label>
-
-        <div className="flex items-end md:col-span-2 xl:col-span-1">
-          {isEditMode ? (
-            <p className="max-w-[160px] pb-1 text-xs font-semibold leading-4 text-slate-500">
-              Direct lokaal bijgewerkt.
-            </p>
-          ) : (
-            <button
-              className="h-9 w-full rounded-md bg-perceel-green px-3 text-sm font-semibold text-white hover:bg-emerald-800 xl:h-[30px] xl:w-auto"
-              type="submit"
-            >
-              Toevoegen
-            </button>
-          )}
-        </div>
       </div>
 
       {isEditMode ? (
@@ -307,19 +292,33 @@ export function PlanningForm({
           auditUser={auditUser}
           selectedResourceIds={formState.resourceIds}
         />
-        {!isEditMode ? (
-          <label className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600">
-            <input
-              checked={keepResourceSelection}
-              className="h-3.5 w-3.5 rounded border-perceel-line"
-              onChange={(event) =>
-                setKeepResourceSelection(event.target.checked)
-              }
-              type="checkbox"
-            />
-            Materieel behouden
-          </label>
-        ) : null}
+        <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          {!isEditMode ? (
+            <label className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600">
+              <input
+                checked={keepResourceSelection}
+                className="h-3.5 w-3.5 rounded border-perceel-line"
+                onChange={(event) =>
+                  setKeepResourceSelection(event.target.checked)
+                }
+                type="checkbox"
+              />
+              Materieel behouden
+            </label>
+          ) : (
+            <p className="text-xs font-semibold leading-4 text-slate-500">
+              Direct lokaal bijgewerkt.
+            </p>
+          )}
+          {!isEditMode ? (
+            <button
+              className="h-9 w-full rounded-md bg-perceel-green px-4 text-sm font-semibold text-white hover:bg-emerald-800 sm:w-auto"
+              type="submit"
+            >
+              Toevoegen
+            </button>
+          ) : null}
+        </div>
       </div>
 
       {error ? (
