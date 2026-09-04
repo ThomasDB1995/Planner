@@ -72,10 +72,17 @@ alter table public.employee_availability enable row level security;
 alter table public.weekly_employee_additions enable row level security;
 alter table public.resource_favorites enable row level security;
 
-grant usage on schema public to authenticated;
+grant usage on schema public to anon, authenticated;
 grant select, insert, update, delete on table public.employee_availability to authenticated;
 grant select, insert, delete on table public.weekly_employee_additions to authenticated;
-grant select, insert, delete on table public.resource_favorites to authenticated;
+grant select, insert, delete on table public.resource_favorites to anon, authenticated;
+
+drop policy if exists "Authenticated users can read resource favorites" on public.resource_favorites;
+drop policy if exists "Authenticated users can create resource favorites" on public.resource_favorites;
+drop policy if exists "Authenticated users can delete resource favorites" on public.resource_favorites;
+drop policy if exists "App users can read resource favorites" on public.resource_favorites;
+drop policy if exists "App users can create resource favorites" on public.resource_favorites;
+drop policy if exists "App users can delete resource favorites" on public.resource_favorites;
 
 do $$
 begin
@@ -175,12 +182,12 @@ begin
     select 1 from pg_policies
     where schemaname = 'public'
       and tablename = 'resource_favorites'
-      and policyname = 'Authenticated users can read resource favorites'
+      and policyname = 'App users can read resource favorites'
   ) then
-    execute 'create policy "Authenticated users can read resource favorites"
+    execute 'create policy "App users can read resource favorites"
       on public.resource_favorites
       for select
-      to authenticated
+      to anon, authenticated
       using (true)';
   end if;
 
@@ -188,12 +195,12 @@ begin
     select 1 from pg_policies
     where schemaname = 'public'
       and tablename = 'resource_favorites'
-      and policyname = 'Authenticated users can create resource favorites'
+      and policyname = 'App users can create resource favorites'
   ) then
-    execute 'create policy "Authenticated users can create resource favorites"
+    execute 'create policy "App users can create resource favorites"
       on public.resource_favorites
       for insert
-      to authenticated
+      to anon, authenticated
       with check (true)';
   end if;
 
@@ -201,12 +208,12 @@ begin
     select 1 from pg_policies
     where schemaname = 'public'
       and tablename = 'resource_favorites'
-      and policyname = 'Authenticated users can delete resource favorites'
+      and policyname = 'App users can delete resource favorites'
   ) then
-    execute 'create policy "Authenticated users can delete resource favorites"
+    execute 'create policy "App users can delete resource favorites"
       on public.resource_favorites
       for delete
-      to authenticated
+      to anon, authenticated
       using (true)';
   end if;
 end $$;
