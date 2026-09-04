@@ -209,14 +209,12 @@ export function PlanningCell({
             )}
             isEditingEnabled={isEditingEnabled}
             isSelected={selectedCard?.planningItemId === item.id}
-            isWeekend={isWeekend}
             item={item}
             key={item.id}
             onDelete={() => onDeleteCard(item.id)}
             onDragEnd={() => onSelectCard({ planningItemId: item.id })}
             onDragStart={() => onSelectCard({ planningItemId: item.id })}
             onSelect={() => onSelectCard({ planningItemId: item.id })}
-            rowTone={rowTone}
             resources={getPlanningItemResourceIds(item)
               .map((resourceId) =>
                 resources.find((resource) => resource.id === resourceId)
