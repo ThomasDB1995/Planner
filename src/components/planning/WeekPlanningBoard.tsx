@@ -439,7 +439,7 @@ export function WeekPlanningBoard({
           ) : null}
           {isEditingEnabled && canMoveSelectedCard ? (
             <button
-              className="w-full rounded-md bg-perceel-green px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-800 sm:w-auto"
+              className="w-full rounded-md bg-perceel-green px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-800 sm:w-auto lg:hidden"
               data-action="move-selected-card"
               onClick={onMoveSelectedCard}
               type="button"
