@@ -30,6 +30,7 @@ export function WeekHeader({ days }: WeekHeaderProps) {
       {days.map((day) => (
         <div
           className={`flex min-h-8 snap-start items-center justify-center border-r border-slate-300 px-2 py-1.5 text-center text-slate-900 last:border-r-0 ${isWeekendDay(day) ? "bg-slate-200/70" : "bg-slate-100"}`}
+          data-week-date={day.date}
           key={day.date}
         >
           <span className="leading-4">{formatHeaderDate(day.date)}</span>

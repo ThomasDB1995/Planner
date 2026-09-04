@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ConflictSummary } from "@/components/planning/ConflictSummary";
 import { EmployeeRow } from "@/components/planning/EmployeeRow";
 import type {
@@ -85,6 +85,21 @@ function formatCompactWeekRange(days: WeekDay[]): string {
   return `${compactDateWithYearFormatter.format(firstDate)} \u2013 ${compactDateWithYearFormatter.format(lastDate)}`;
 }
 
+function getCurrentDateInputValue(): string {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function isMobilePlannerViewport(): boolean {
+  return typeof window !== "undefined"
+    ? window.matchMedia("(max-width: 639px)").matches
+    : false;
+}
+
 export function WeekPlanningBoard({
   days,
   employees,
@@ -122,6 +137,8 @@ export function WeekPlanningBoard({
   const [weekInput, setWeekInput] = useState(() => String(activeWeekNumber));
   const [yearInput, setYearInput] = useState(() => String(activeWeekYear));
   const [weekJumpError, setWeekJumpError] = useState("");
+  const gridScrollerRef = useRef<HTMLDivElement>(null);
+  const pendingTodayScrollRef = useRef(false);
   const weeklyEmployeeIdSet = new Set(weeklyEmployeeIds);
   const selectedAvailabilityPickerValue =
     selectedCellAvailability && selectedCellAvailability.type !== "unavailable"
@@ -133,6 +150,45 @@ export function WeekPlanningBoard({
     setYearInput(String(activeWeekYear));
     setWeekJumpError("");
   }, [activeWeekNumber, activeWeekYear]);
+
+  useEffect(() => {
+    if (!pendingTodayScrollRef.current) {
+      return;
+    }
+
+    pendingTodayScrollRef.current = false;
+    scrollMobileGridToToday();
+  }, [days]);
+
+  function scrollMobileGridToToday() {
+    if (!isMobilePlannerViewport()) {
+      return;
+    }
+
+    const scroller = gridScrollerRef.current;
+    const todayDate = getCurrentDateInputValue();
+    const todayHeader = scroller?.querySelector<HTMLElement>(
+      `[data-week-date="${todayDate}"]`
+    );
+
+    if (!scroller || !todayHeader) {
+      return;
+    }
+
+    scroller.scrollTo({
+      left: Math.max(todayHeader.offsetLeft - 116, 0),
+      behavior: "smooth"
+    });
+  }
+
+  function goToToday() {
+    if (isMobilePlannerViewport()) {
+      pendingTodayScrollRef.current = true;
+      window.setTimeout(scrollMobileGridToToday, 0);
+    }
+
+    onGoToCurrentWeek();
+  }
 
   function submitWeekJump(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -265,7 +321,7 @@ export function WeekPlanningBoard({
             </button>
             <button
               className="h-7 rounded border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-perceel-dark"
-              onClick={onGoToCurrentWeek}
+              onClick={goToToday}
               type="button"
             >
               Vandaag
@@ -332,7 +388,10 @@ export function WeekPlanningBoard({
         </div>
       </div>
 
-      <div className="snap-x snap-mandatory scroll-pl-[116px] overflow-x-auto overscroll-x-none rounded-md border border-slate-300 bg-white shadow-sm sm:snap-none sm:scroll-pl-0">
+      <div
+        className="snap-x snap-mandatory scroll-pl-[116px] overflow-x-auto overscroll-x-none rounded-md border border-slate-300 bg-white shadow-sm sm:snap-none sm:scroll-pl-0"
+        ref={gridScrollerRef}
+      >
         <WeekHeader days={days} />
         {employees.map((employee, index) => {
           const showCategorySeparator =
