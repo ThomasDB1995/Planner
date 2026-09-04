@@ -34,6 +34,7 @@ type PlanningCellProps = {
   onSelectCell: (cell: SelectedPlanningCell) => void;
   onSelectCard: (card: SelectedPlanningCard) => void;
   onDeleteCard: (planningItemId: string) => void;
+  onDropCard?: (planningItemId: string, cell: SelectedPlanningCell) => void;
 };
 
 function getAvailabilityCellStateStyle(
@@ -89,7 +90,8 @@ export function PlanningCell({
   isEditingEnabled = true,
   onSelectCell,
   onSelectCard,
-  onDeleteCard
+  onDeleteCard,
+  onDropCard
 }: PlanningCellProps) {
   const cellItems = findPlanningItemsForCell(items, employeeId, date);
   const hasPlanningItems = cellItems.length > 0;
@@ -128,6 +130,33 @@ export function PlanningCell({
         if (isEditingEnabled) {
           onSelectCell({ employeeId, date });
         }
+      }}
+      onDragOver={(event) => {
+        if (!isEditingEnabled || !onDropCard) {
+          return;
+        }
+
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+      }}
+      onDrop={(event) => {
+        if (!isEditingEnabled || !onDropCard) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const planningItemId =
+          event.dataTransfer.getData(
+            "application/x-perceel-planning-item-id"
+          ) || event.dataTransfer.getData("text/plain");
+
+        if (!planningItemId) {
+          return;
+        }
+
+        onDropCard(planningItemId, { employeeId, date });
       }}
       onKeyDown={(event) => {
         if (!isEditingEnabled) {
@@ -173,6 +202,8 @@ export function PlanningCell({
             item={item}
             key={item.id}
             onDelete={() => onDeleteCard(item.id)}
+            onDragEnd={() => onSelectCard({ planningItemId: item.id })}
+            onDragStart={() => onSelectCard({ planningItemId: item.id })}
             onSelect={() => onSelectCard({ planningItemId: item.id })}
             resources={getPlanningItemResourceIds(item)
               .map((resourceId) =>

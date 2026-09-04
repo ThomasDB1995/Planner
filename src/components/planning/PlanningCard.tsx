@@ -7,6 +7,8 @@ type PlanningCardProps = {
   conflicts: PlanningConflict[];
   isSelected: boolean;
   isEditingEnabled?: boolean;
+  onDragEnd?: () => void;
+  onDragStart?: () => void;
   onSelect: () => void;
   onDelete: () => void;
 };
@@ -26,6 +28,8 @@ export function PlanningCard({
   conflicts,
   isSelected,
   isEditingEnabled = true,
+  onDragEnd,
+  onDragStart,
   onSelect,
   onDelete
 }: PlanningCardProps) {
@@ -42,6 +46,7 @@ export function PlanningCard({
     .join("\n");
   const auditEmail = item.updatedByEmail ?? item.createdByEmail ?? "";
   const auditInitial = auditEmail ? getUserInitial(auditEmail) : "";
+  const isOption = item.status === "voorlopig";
   const auditTitle = [
     item.createdByEmail ? `Aangemaakt door ${item.createdByEmail}` : "",
     item.updatedByEmail ? `Gewijzigd door ${item.updatedByEmail}` : ""
@@ -51,12 +56,33 @@ export function PlanningCard({
 
   return (
     <article
-      className={`relative cursor-pointer border-l-4 border-slate-300 bg-white px-1.5 py-0.5 text-xs leading-4 text-slate-700 ${
+      className={`relative cursor-pointer border-l-4 px-1.5 py-0.5 text-xs leading-4 text-slate-700 ${
+        isOption
+          ? "border-amber-400 border-y border-r border-dashed border-y-amber-200 border-r-amber-200 bg-amber-50/55"
+          : "border-slate-300 bg-white"
+      } ${
         isEditingEnabled || auditInitial ? "pr-6" : ""
       } ${
         auditInitial ? "pb-3" : ""
       } ${selectedStyle}`}
       data-selected={isSelected ? "true" : "false"}
+      data-status={item.status}
+      draggable={isEditingEnabled}
+      onDragEnd={onDragEnd}
+      onDragStart={(event) => {
+        if (!isEditingEnabled) {
+          event.preventDefault();
+          return;
+        }
+
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", item.id);
+        event.dataTransfer.setData(
+          "application/x-perceel-planning-item-id",
+          item.id
+        );
+        onDragStart?.();
+      }}
       onClick={(event) => {
         event.stopPropagation();
         onSelect();
@@ -76,6 +102,11 @@ export function PlanningCard({
       <p className="truncate font-semibold text-slate-950" title={item.taskName}>
         {item.taskName}
       </p>
+      {isOption ? (
+        <span className="mt-0.5 inline-flex rounded-sm border border-amber-200 bg-white/70 px-1 py-0.5 text-[9px] font-bold uppercase leading-3 text-amber-800">
+          Optie
+        </span>
+      ) : null}
       {isEditingEnabled ? (
         <button
           aria-label={`Verwijder ${item.taskName}`}

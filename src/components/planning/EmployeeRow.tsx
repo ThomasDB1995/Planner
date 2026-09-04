@@ -29,6 +29,7 @@ type EmployeeRowProps = {
   onSelectCell: (cell: SelectedPlanningCell) => void;
   onSelectCard: (card: SelectedPlanningCard) => void;
   onDeleteCard: (planningItemId: string) => void;
+  onDropCard?: (planningItemId: string, cell: SelectedPlanningCell) => void;
   onRemoveEmployeeFromWeek?: (employeeId: string) => void;
   isWeeklyAddedEmployee?: boolean;
 };
@@ -73,6 +74,7 @@ export function EmployeeRow({
   onSelectCell,
   onSelectCard,
   onDeleteCard,
+  onDropCard,
   onRemoveEmployeeFromWeek,
   isWeeklyAddedEmployee = false
 }: EmployeeRowProps) {
@@ -134,6 +136,7 @@ export function EmployeeRow({
           items={items}
           key={day.date}
           onDeleteCard={onDeleteCard}
+          onDropCard={onDropCard}
           isEditingEnabled={isEditingEnabled}
           onSelectCard={onSelectCard}
           onSelectCell={onSelectCell}

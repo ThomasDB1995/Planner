@@ -41,6 +41,7 @@ type WeekPlanningBoardProps = {
   onSelectCell: (cell: SelectedPlanningCell) => void;
   onSelectCard: (card: SelectedPlanningCard) => void;
   onDeleteCard: (planningItemId: string) => void;
+  onDropCard: (planningItemId: string, cell: SelectedPlanningCell) => void;
   onMoveSelectedCard: () => void;
   onGoToCurrentWeek: () => void;
   onGoToNextWeek: () => void;
@@ -118,6 +119,7 @@ export function WeekPlanningBoard({
   onSelectCell,
   onSelectCard,
   onDeleteCard,
+  onDropCard,
   onMoveSelectedCard,
   onGoToCurrentWeek,
   onGoToNextWeek,
@@ -485,6 +487,7 @@ export function WeekPlanningBoard({
                 isEditingEnabled={isEditingEnabled}
                 items={items}
                 onDeleteCard={onDeleteCard}
+                onDropCard={onDropCard}
                 onRemoveEmployeeFromWeek={onRemoveEmployeeFromWeek}
                 onSelectCard={onSelectCard}
                 onSelectCell={onSelectCell}

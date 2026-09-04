@@ -9,7 +9,12 @@ import {
   withPlanningItemResourceIds
 } from "@/lib/planning/planning-resources";
 import type { PlannerAuditUser } from "@/lib/supabase/audit";
-import type { Employee, PlanningItem, Resource } from "@/types/planning";
+import type {
+  Employee,
+  PlanningItem,
+  PlanningStatus,
+  Resource
+} from "@/types/planning";
 
 type PlanningFormProps = {
   employees: Employee[];
@@ -26,7 +31,7 @@ type PlanningFormProps = {
   onCreate: (item: Omit<PlanningItem, "id">) => void;
   onEditChange: (
     planningItemId: string,
-    updates: Partial<Pick<PlanningItem, "taskName" | "resourceIds">>,
+    updates: Partial<Pick<PlanningItem, "taskName" | "resourceIds" | "status">>,
     debounce?: boolean
   ) => void;
   onFlushPendingEdits?: () => void;
@@ -38,14 +43,24 @@ type PlanningFormState = {
   employeeId: string;
   taskName: string;
   resourceIds: string[];
+  status: PlanningStatus;
 };
 
 const initialFormState: PlanningFormState = {
   date: "",
   employeeId: "",
   taskName: "",
-  resourceIds: []
+  resourceIds: [],
+  status: "bevestigd"
 };
+
+const planningStatusOptions: Array<{
+  label: string;
+  value: PlanningStatus;
+}> = [
+  { label: "Bevestigd", value: "bevestigd" },
+  { label: "Optie", value: "voorlopig" }
+];
 
 export function PlanningForm({
   employees,
@@ -90,7 +105,8 @@ export function PlanningForm({
       date: selectedCell.date,
       employeeId: selectedCell.employeeId,
       taskName: shouldResetEditFields ? "" : currentState.taskName,
-      resourceIds: shouldResetEditFields ? [] : currentState.resourceIds
+      resourceIds: shouldResetEditFields ? [] : currentState.resourceIds,
+      status: shouldResetEditFields ? "bevestigd" : currentState.status
     }));
     wasEditingRef.current = false;
     taskNameInputRef.current?.focus();
@@ -105,7 +121,8 @@ export function PlanningForm({
       date: editingItem.date,
       employeeId: editingItem.employeeId,
       taskName: editingItem.taskName,
-      resourceIds: getPlanningItemResourceIds(editingItem)
+      resourceIds: getPlanningItemResourceIds(editingItem),
+      status: editingItem.status
     });
     wasEditingRef.current = true;
     setError("");
@@ -129,6 +146,9 @@ export function PlanningForm({
       onEditChange(editingItem.id, { taskName: value as string });
     }
 
+    if (field === "status") {
+      onEditChange(editingItem.id, { status: value as PlanningStatus }, false);
+    }
   }
 
   function updateResourceIds(resourceIds: string[]) {
@@ -164,13 +184,14 @@ export function PlanningForm({
       date: formState.date,
       employeeId: formState.employeeId,
       taskName: formState.taskName.trim(),
-      status: "voorlopig"
+      status: formState.status
     }, formState.resourceIds));
     setFormState({
       date: selectedCell?.date ?? formState.date,
       employeeId: selectedCell?.employeeId ?? formState.employeeId,
       taskName: "",
-      resourceIds: keepResourceSelection ? formState.resourceIds : []
+      resourceIds: keepResourceSelection ? formState.resourceIds : [],
+      status: formState.status
     });
     setError("");
     taskNameInputRef.current?.focus();
@@ -219,7 +240,7 @@ export function PlanningForm({
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-1 gap-2.5 md:grid-cols-[130px_145px_minmax(260px,1fr)]">
+      <div className="mt-3 grid grid-cols-1 gap-2.5 md:grid-cols-[130px_145px_128px_minmax(260px,1fr)]">
         <label className="text-xs font-semibold text-slate-700">
           Datum
           <input
@@ -249,6 +270,27 @@ export function PlanningForm({
                 {getEmployeeDisplayName(employee)}
               </option>
             ))}
+          </select>
+        </label>
+
+        <label className="text-xs font-semibold text-slate-700">
+          Status
+          <select
+            className="mt-1 h-9 w-full rounded-md border border-perceel-line px-2 py-1 text-sm"
+            onBlur={onFlushPendingEdits}
+            onChange={(event) =>
+              updateField("status", event.target.value as PlanningStatus)
+            }
+            value={formState.status}
+          >
+            {planningStatusOptions.map((statusOption) => (
+              <option key={statusOption.value} value={statusOption.value}>
+                {statusOption.label}
+              </option>
+            ))}
+            {formState.status === "uitgevoerd" ? (
+              <option value="uitgevoerd">Uitgevoerd</option>
+            ) : null}
           </select>
         </label>
 

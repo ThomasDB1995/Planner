@@ -1112,7 +1112,7 @@ export default function Home() {
 
   function updatePlanningItem(
     planningItemId: string,
-    updates: Partial<Pick<PlanningItem, "taskName" | "resourceIds">>,
+    updates: Partial<Pick<PlanningItem, "taskName" | "resourceIds" | "status">>,
     debounce = true
   ) {
     const currentItem = planningItems.find((item) => item.id === planningItemId);
@@ -1360,6 +1360,60 @@ export default function Home() {
     }
   }
 
+  function movePlanningItemToCell(
+    planningItemId: string,
+    destinationCell: SelectedPlanningCell
+  ) {
+    const currentItem = planningItems.find((item) => item.id === planningItemId);
+
+    if (!currentItem) {
+      return;
+    }
+
+    if (
+      currentItem.employeeId === destinationCell.employeeId &&
+      currentItem.date === destinationCell.date
+    ) {
+      setSelectedCard({ planningItemId });
+      setSelectedCell(destinationCell);
+      setRelocationSourceCard(null);
+      setActiveDestinationCell(null);
+      return;
+    }
+
+    const movedItem = {
+      ...currentItem,
+      employeeId: destinationCell.employeeId,
+      date: destinationCell.date
+    };
+
+    setPlanningItems((currentItems) =>
+      currentItems.map((item) =>
+        item.id === planningItemId ? movedItem : item
+      )
+    );
+    persistPlanningItemUpdate(movedItem, false);
+    showUndoToast("Planningitem verplaatst.", async () => {
+      upsertPlanningItemInState(currentItem);
+
+      if (shouldPersistPlanningItems()) {
+        try {
+          await updatePlannerPlanningItem(currentItem, auditUser);
+        } catch (error) {
+          upsertPlanningItemInState(movedItem);
+          throw error;
+        }
+      }
+    });
+    setActiveDestinationCell(null);
+    setRelocationSourceCard(null);
+    setSelectedCard({ planningItemId });
+    setSelectedCell(destinationCell);
+    setEditingPlanningItemId((currentEditingItemId) =>
+      currentEditingItemId === planningItemId ? planningItemId : currentEditingItemId
+    );
+  }
+
   function moveSelectedCardToActiveDestination() {
     if (!activeRelocationCard || !activeDestinationCell || !selectedPlanningItem) {
       return;
@@ -1369,35 +1423,10 @@ export default function Home() {
       return;
     }
 
-    const movedItem = {
-      ...selectedPlanningItem,
-      employeeId: activeDestinationCell.employeeId,
-      date: activeDestinationCell.date
-    };
-
-    setPlanningItems((currentItems) =>
-      currentItems.map((item) =>
-        item.id === activeRelocationCard.planningItemId
-          ? movedItem
-          : item
-      )
+    movePlanningItemToCell(
+      activeRelocationCard.planningItemId,
+      activeDestinationCell
     );
-    persistPlanningItemUpdate(movedItem, false);
-    showUndoToast("Planningitem verplaatst.", async () => {
-      upsertPlanningItemInState(selectedPlanningItem);
-
-      if (shouldPersistPlanningItems()) {
-        try {
-          await updatePlannerPlanningItem(selectedPlanningItem, auditUser);
-        } catch (error) {
-          upsertPlanningItemInState(movedItem);
-          throw error;
-        }
-      }
-    });
-    setActiveDestinationCell(null);
-    setRelocationSourceCard(null);
-    setSelectedCard(null);
   }
 
   return (
@@ -1631,6 +1660,7 @@ export default function Home() {
               canMoveSelectedCard={canMoveSelectedCard}
               onSetEditingEnabled={switchPlannerMode}
               onDeleteCard={deletePlanningItem}
+              onDropCard={movePlanningItemToCell}
               onGoToCurrentWeek={goToCurrentWeek}
               onGoToNextWeek={goToNextWeek}
               onGoToPreviousWeek={goToPreviousWeek}
