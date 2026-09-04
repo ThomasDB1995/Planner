@@ -96,7 +96,7 @@ function getCurrentDateInputValue(): string {
 
 function isMobilePlannerViewport(): boolean {
   return typeof window !== "undefined"
-    ? window.matchMedia("(max-width: 767px)").matches
+    ? window.matchMedia("(max-width: 767px), (pointer: coarse)").matches
     : false;
 }
 
@@ -138,7 +138,10 @@ export function WeekPlanningBoard({
   const [yearInput, setYearInput] = useState(() => String(activeWeekYear));
   const [weekJumpError, setWeekJumpError] = useState("");
   const gridScrollerRef = useRef<HTMLDivElement>(null);
-  const pendingTodayScrollRef = useRef(false);
+  const [mobileDateScrollRequest, setMobileDateScrollRequest] = useState<{
+    date: string;
+    requestId: number;
+  } | null>(null);
   const weeklyEmployeeIdSet = new Set(weeklyEmployeeIds);
   const selectedAvailabilityPickerValue =
     selectedCellAvailability && selectedCellAvailability.type !== "unavailable"
@@ -152,50 +155,60 @@ export function WeekPlanningBoard({
   }, [activeWeekNumber, activeWeekYear]);
 
   useEffect(() => {
-    if (!pendingTodayScrollRef.current) {
+    if (!mobileDateScrollRequest) {
       return;
     }
 
-    pendingTodayScrollRef.current = false;
-    scheduleMobileGridScrollToToday();
-  }, [days]);
+    scheduleMobileGridScrollToDate(mobileDateScrollRequest.date);
+  }, [days, mobileDateScrollRequest]);
 
-  function scrollMobileGridToToday() {
+  function scrollMobileGridToDate(date: string) {
     if (!isMobilePlannerViewport()) {
       return;
     }
 
     const scroller = gridScrollerRef.current;
-    const todayDate = getCurrentDateInputValue();
-    const todayHeader = scroller?.querySelector<HTMLElement>(
-      `[data-week-date="${todayDate}"]`
+    const targetHeader = scroller?.querySelector<HTMLElement>(
+      `[data-week-date="${date}"]`
     );
 
-    if (!scroller || !todayHeader || scroller.scrollWidth <= scroller.clientWidth) {
+    if (
+      !scroller ||
+      !targetHeader ||
+      scroller.scrollWidth <= scroller.clientWidth
+    ) {
       return;
     }
 
     const stickyEmployeeColumnWidth =
       scroller.querySelector<HTMLElement>("[data-planner-employee-column]")
         ?.offsetWidth ?? 116;
+    const targetScrollLeft = Math.max(
+      targetHeader.offsetLeft - stickyEmployeeColumnWidth,
+      0
+    );
 
     scroller.scrollTo({
-      left: Math.max(todayHeader.offsetLeft - stickyEmployeeColumnWidth, 0),
+      left: targetScrollLeft,
       behavior: "smooth"
     });
   }
 
-  function scheduleMobileGridScrollToToday() {
+  function scheduleMobileGridScrollToDate(date: string) {
     window.requestAnimationFrame(() => {
-      scrollMobileGridToToday();
-      window.requestAnimationFrame(scrollMobileGridToToday);
+      scrollMobileGridToDate(date);
+      window.requestAnimationFrame(() => scrollMobileGridToDate(date));
     });
   }
 
   function goToToday() {
+    const todayDate = getCurrentDateInputValue();
+
     if (isMobilePlannerViewport()) {
-      pendingTodayScrollRef.current = true;
-      scheduleMobileGridScrollToToday();
+      setMobileDateScrollRequest({
+        date: todayDate,
+        requestId: Date.now()
+      });
     }
 
     onGoToCurrentWeek();
