@@ -97,9 +97,9 @@ export function EmployeeRow({
   }
 
   return (
-    <div className="group grid min-w-[calc(116px+7*(100vw-152px))] grid-cols-[116px_repeat(7,minmax(220px,calc(100vw-152px)))] items-stretch border-b border-slate-400/55 last:border-b-0 sm:min-w-[920px] sm:grid-cols-[144px_repeat(7,minmax(110px,1fr))] lg:min-w-[1040px] lg:grid-cols-[156px_repeat(7,minmax(126px,1fr))]">
+    <div className="group grid min-w-[calc(116px+7*(100vw-152px))] grid-cols-[116px_repeat(7,minmax(220px,calc(100vw-152px)))] items-stretch border-b border-slate-400/70 last:border-b-0 sm:min-w-[920px] sm:grid-cols-[144px_repeat(7,minmax(110px,1fr))] lg:min-w-[1040px] lg:grid-cols-[156px_repeat(7,minmax(126px,1fr))]">
       <div
-        className={`sticky left-0 z-10 flex min-h-[72px] items-center border-r border-slate-300 px-1.5 py-1.5 text-[12px] font-semibold text-perceel-dark shadow-[3px_0_0_rgba(148,163,184,0.22)] sm:px-2 sm:text-sm ${employeeCellToneStyle}`}
+        className={`sticky left-0 z-10 flex min-h-[72px] items-center border-b border-r border-slate-300/90 px-1.5 py-1.5 text-[12px] font-semibold text-perceel-dark shadow-[3px_0_0_rgba(148,163,184,0.22)] sm:px-2 sm:text-sm ${employeeCellToneStyle}`}
       >
         <div className="relative min-w-0 w-full pr-5">
           <span className="block leading-4" title={employeeDisplayName}>

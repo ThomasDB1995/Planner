@@ -128,7 +128,7 @@ export function PlanningCell({
 
   return (
     <div
-      className={`h-full min-h-[72px] snap-start border-r border-slate-300/80 px-1 py-1 outline-none last:border-r-0 ${
+      className={`h-full min-h-[72px] snap-start border-b border-r border-slate-300/90 px-1 py-1 outline-none last:border-r-0 ${
         isEditingEnabled ? "cursor-pointer" : ""
       } ${stateStyle}`}
       data-date={date}
