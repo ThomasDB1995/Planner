@@ -102,6 +102,25 @@ function isMobilePlannerViewport(): boolean {
     : false;
 }
 
+function getDefaultMobileDate(
+  days: WeekDay[],
+  selectedCell: SelectedPlanningCell | null
+): string {
+  const selectedDate = selectedCell?.date;
+
+  if (selectedDate && days.some((day) => day.date === selectedDate)) {
+    return selectedDate;
+  }
+
+  const todayDate = getCurrentDateInputValue();
+
+  if (days.some((day) => day.date === todayDate)) {
+    return todayDate;
+  }
+
+  return days[0]?.date ?? "";
+}
+
 export function WeekPlanningBoard({
   days,
   employees,
@@ -146,6 +165,9 @@ export function WeekPlanningBoard({
     date: string;
     requestId: number;
   } | null>(null);
+  const [mobileVisibleDate, setMobileVisibleDate] = useState(() =>
+    getDefaultMobileDate(days, selectedCell)
+  );
   const weeklyEmployeeIdSet = new Set(weeklyEmployeeIds);
   const selectedAvailabilityPickerValue =
     selectedCellAvailability && selectedCellAvailability.type !== "unavailable"
@@ -165,6 +187,74 @@ export function WeekPlanningBoard({
 
     scheduleMobileGridScrollToDate(mobileDateScrollRequest.date);
   }, [days, mobileDateScrollRequest]);
+
+  useEffect(() => {
+    const nextMobileDate = getDefaultMobileDate(days, selectedCell);
+
+    if (nextMobileDate) {
+      setMobileVisibleDate(nextMobileDate);
+    }
+  }, [days, selectedCell]);
+
+  useEffect(() => {
+    const scroller = gridScrollerRef.current;
+
+    if (!scroller) {
+      return;
+    }
+
+    const activeScroller = scroller;
+    let animationFrameId = 0;
+
+    function updateVisibleMobileDate() {
+      if (!isMobilePlannerViewport()) {
+        return;
+      }
+
+      const stickyEmployeeColumnWidth =
+        activeScroller.querySelector<HTMLElement>(
+          "[data-planner-employee-column]"
+        )?.offsetWidth ?? 116;
+      const dayHeaders = Array.from(
+        activeScroller.querySelectorAll<HTMLElement>("[data-week-date]")
+      );
+      const scrollPosition =
+        activeScroller.scrollLeft + stickyEmployeeColumnWidth;
+      const visibleHeader = dayHeaders.reduce<HTMLElement | null>(
+        (closestHeader, header) => {
+          if (!closestHeader) {
+            return header;
+          }
+
+          return Math.abs(header.offsetLeft - scrollPosition) <
+            Math.abs(closestHeader.offsetLeft - scrollPosition)
+            ? header
+            : closestHeader;
+        },
+        null
+      );
+      const visibleDate = visibleHeader?.dataset.weekDate;
+
+      if (visibleDate) {
+        setMobileVisibleDate(visibleDate);
+      }
+    }
+
+    function handleScroll() {
+      window.cancelAnimationFrame(animationFrameId);
+      animationFrameId = window.requestAnimationFrame(updateVisibleMobileDate);
+    }
+
+    updateVisibleMobileDate();
+    activeScroller.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrameId);
+      activeScroller.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, [days]);
 
   function scrollMobileGridToDate(date: string) {
     if (!isMobilePlannerViewport()) {
@@ -210,6 +300,7 @@ export function WeekPlanningBoard({
       return;
     }
 
+    setMobileVisibleDate(date);
     setMobileDateScrollRequest({
       date,
       requestId: Date.now()
@@ -374,9 +465,7 @@ export function WeekPlanningBoard({
           <div className="mt-1 grid w-full grid-cols-7 gap-1 sm:hidden">
             {days.map((day) => {
               const isToday = day.date === getCurrentDateInputValue();
-              const isSelectedDay =
-                selectedCell?.date === day.date ||
-                mobileDateScrollRequest?.date === day.date;
+              const isSelectedDay = mobileVisibleDate === day.date;
 
               return (
                 <button
