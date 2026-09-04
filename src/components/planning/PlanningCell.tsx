@@ -61,15 +61,25 @@ function getAvailabilityCellStateStyle(
 
   const classNames: Record<AvailabilityType, string> = {
     unavailable:
-      "border-slate-300/80 bg-slate-100/90 shadow-[inset_3px_0_0_rgba(100,116,139,0.35)] hover:bg-slate-100",
+      rowTone === "soft"
+        ? "border-slate-300/80 bg-slate-200/70 shadow-[inset_3px_0_0_rgba(100,116,139,0.35)] hover:bg-slate-200/80"
+        : "border-slate-300/80 bg-slate-100/90 shadow-[inset_3px_0_0_rgba(100,116,139,0.35)] hover:bg-slate-100",
     recovery:
-      "border-slate-300/80 bg-emerald-50 shadow-[inset_3px_0_0_rgba(16,185,129,0.28)] hover:bg-emerald-50",
+      rowTone === "soft"
+        ? "border-slate-300/80 bg-emerald-100/55 shadow-[inset_3px_0_0_rgba(16,185,129,0.28)] hover:bg-emerald-100/65"
+        : "border-slate-300/80 bg-emerald-50 shadow-[inset_3px_0_0_rgba(16,185,129,0.28)] hover:bg-emerald-50",
     vacation:
-      "border-slate-300/80 bg-sky-50 shadow-[inset_3px_0_0_rgba(14,165,233,0.28)] hover:bg-sky-50",
+      rowTone === "soft"
+        ? "border-slate-300/80 bg-sky-100/60 shadow-[inset_3px_0_0_rgba(14,165,233,0.28)] hover:bg-sky-100/70"
+        : "border-slate-300/80 bg-sky-50 shadow-[inset_3px_0_0_rgba(14,165,233,0.28)] hover:bg-sky-50",
     weather_leave:
-      "border-slate-300/80 bg-amber-50 shadow-[inset_3px_0_0_rgba(245,158,11,0.3)] hover:bg-amber-50",
+      rowTone === "soft"
+        ? "border-slate-300/80 bg-amber-100/55 shadow-[inset_3px_0_0_rgba(245,158,11,0.3)] hover:bg-amber-100/65"
+        : "border-slate-300/80 bg-amber-50 shadow-[inset_3px_0_0_rgba(245,158,11,0.3)] hover:bg-amber-50",
     sick_leave:
-      "border-slate-300/80 bg-rose-50 shadow-[inset_3px_0_0_rgba(244,63,94,0.26)] hover:bg-rose-50"
+      rowTone === "soft"
+        ? "border-slate-300/80 bg-rose-100/55 shadow-[inset_3px_0_0_rgba(244,63,94,0.26)] hover:bg-rose-100/65"
+        : "border-slate-300/80 bg-rose-50 shadow-[inset_3px_0_0_rgba(244,63,94,0.26)] hover:bg-rose-50"
   };
 
   return classNames[type];
