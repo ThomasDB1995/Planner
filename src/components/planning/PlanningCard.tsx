@@ -56,10 +56,10 @@ export function PlanningCard({
 
   return (
     <article
-      className={`relative cursor-pointer border-l-4 px-1.5 py-0.5 text-xs leading-4 text-slate-700 ${
+      className={`relative cursor-pointer border-l-4 px-1.5 py-0.5 text-xs leading-4 text-slate-700 shadow-[0_1px_2px_rgba(15,23,42,0.08)] ${
         isOption
           ? "border-amber-400 border-y border-r border-dashed border-y-amber-200 border-r-amber-200 bg-amber-50/55"
-          : "border-slate-300 bg-white"
+          : "border-slate-300 bg-slate-50/90 ring-1 ring-inset ring-white/75"
       } ${
         isEditingEnabled || auditInitial ? "pr-6" : ""
       } ${
@@ -127,14 +127,14 @@ export function PlanningCard({
         >
           {visibleResourceChips.map((resource) => (
             <span
-              className="border border-slate-300 bg-slate-50 px-1 py-0.5 text-[10px] font-semibold leading-3 text-slate-700"
+              className="border border-slate-300 bg-white/85 px-1 py-0.5 text-[10px] font-semibold leading-3 text-slate-700"
               key={resource.id}
             >
               {resource.number}
             </span>
           ))}
           {hiddenResourceCount > 0 ? (
-            <span className="border border-slate-300 bg-slate-100 px-1 py-0.5 text-[10px] font-semibold leading-3 text-slate-600">
+            <span className="border border-slate-300 bg-white/70 px-1 py-0.5 text-[10px] font-semibold leading-3 text-slate-600">
               +{hiddenResourceCount}
             </span>
           ) : null}
