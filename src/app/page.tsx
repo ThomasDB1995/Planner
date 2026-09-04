@@ -72,6 +72,15 @@ type PlannerUndoToast = {
 };
 
 const PULL_REFRESH_TRIGGER_DISTANCE = 72;
+const PULL_REFRESH_DIRECTION_THRESHOLD = 12;
+const PULL_REFRESH_VERTICAL_DOMINANCE = 1.35;
+
+function isPlannerDayScrollerTouch(target: EventTarget | null): boolean {
+  return (
+    target instanceof Element &&
+    Boolean(target.closest("[data-planner-day-scroller]"))
+  );
+}
 
 function mergePlanningItemsForDates(
   currentItems: PlanningItem[],
@@ -215,8 +224,10 @@ export default function Home() {
     Record<string, ReturnType<typeof setTimeout>>
   >({});
   const pendingPlanningItemSavesRef = useRef<Record<string, PlanningItem>>({});
+  const pullRefreshStartXRef = useRef(0);
   const pullRefreshStartYRef = useRef(0);
   const pullRefreshDistanceRef = useRef(0);
+  const pullRefreshIsTrackingRef = useRef(false);
   const pullRefreshIsActiveRef = useRef(false);
   const undoToastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null
@@ -777,34 +788,68 @@ export default function Home() {
     }
 
     function handleTouchStart(event: TouchEvent) {
-      if (window.scrollY > 0 || event.touches.length !== 1) {
+      if (
+        window.scrollY > 0 ||
+        event.touches.length !== 1 ||
+        isPlannerDayScrollerTouch(event.target)
+      ) {
         return;
       }
 
-      pullRefreshIsActiveRef.current = true;
+      pullRefreshIsTrackingRef.current = true;
+      pullRefreshIsActiveRef.current = false;
+      pullRefreshStartXRef.current = event.touches[0].clientX;
       pullRefreshStartYRef.current = event.touches[0].clientY;
       setPullRefreshDistanceValue(0);
     }
 
     function handleTouchMove(event: TouchEvent) {
-      if (!pullRefreshIsActiveRef.current || event.touches.length !== 1) {
+      if (!pullRefreshIsTrackingRef.current || event.touches.length !== 1) {
         return;
       }
 
       if (window.scrollY > 0) {
+        pullRefreshIsTrackingRef.current = false;
         pullRefreshIsActiveRef.current = false;
         setPullRefreshDistanceValue(0);
         return;
       }
 
-      const nextDistance = event.touches[0].clientY - pullRefreshStartYRef.current;
+      const touch = event.touches[0];
+      const deltaX = touch.clientX - pullRefreshStartXRef.current;
+      const deltaY = touch.clientY - pullRefreshStartYRef.current;
+      const absoluteDeltaX = Math.abs(deltaX);
 
-      if (nextDistance <= 0) {
+      if (!pullRefreshIsActiveRef.current) {
+        if (
+          absoluteDeltaX > PULL_REFRESH_DIRECTION_THRESHOLD &&
+          absoluteDeltaX > Math.abs(deltaY)
+        ) {
+          pullRefreshIsTrackingRef.current = false;
+          setPullRefreshDistanceValue(0);
+          return;
+        }
+
+        if (deltaY < PULL_REFRESH_DIRECTION_THRESHOLD) {
+          setPullRefreshDistanceValue(0);
+          return;
+        }
+
+        if (deltaY < absoluteDeltaX * PULL_REFRESH_VERTICAL_DOMINANCE) {
+          pullRefreshIsTrackingRef.current = false;
+          setPullRefreshDistanceValue(0);
+          return;
+        }
+
+        pullRefreshIsActiveRef.current = true;
+      }
+
+      if (deltaY <= 0) {
         setPullRefreshDistanceValue(0);
         return;
       }
 
-      setPullRefreshDistanceValue(Math.min(nextDistance, 96));
+      setPullRefreshDistanceValue(Math.min(deltaY, 96));
     }
 
     function handleTouchEnd() {
@@ -815,6 +860,7 @@ export default function Home() {
         refreshPlannerData();
       }
 
+      pullRefreshIsTrackingRef.current = false;
       pullRefreshIsActiveRef.current = false;
       setPullRefreshDistanceValue(0);
     }
