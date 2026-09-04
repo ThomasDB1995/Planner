@@ -178,7 +178,7 @@ export function PlanningForm({
 
   return (
     <form
-      className="rounded-md border border-perceel-line bg-white p-3 shadow-sm lg:sticky lg:top-3 lg:z-50"
+      className="relative isolate z-[100] rounded-md border border-perceel-line bg-white p-3 shadow-sm lg:sticky lg:top-3"
       onSubmit={submitPlanningItem}
     >
       <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">

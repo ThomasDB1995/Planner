@@ -1439,24 +1439,23 @@ export default function Home() {
           ) : null}
 
           {isPlannerEditMode ? (
-            <PlanningForm
-              actionContext={actionContext}
-              auditUser={auditUser}
-              employees={visibleEmployees}
-              resources={resources}
-              resourcesAreLoading={resourceLoadState === "loading"}
-              resourcesLoadError={resourceLoadState === "error"}
-              editingItem={editingPlanningItem}
-              key={currentWeekStartDate}
-              onCreate={addPlanningItem}
-              onEditChange={updatePlanningItem}
-              onFlushPendingEdits={flushPendingPlanningItemSaves}
-              selectedCell={selectedCell}
-            />
-          ) : null}
+            <div className="relative z-40 space-y-3">
+              <PlanningForm
+                actionContext={actionContext}
+                auditUser={auditUser}
+                employees={visibleEmployees}
+                resources={resources}
+                resourcesAreLoading={resourceLoadState === "loading"}
+                resourcesLoadError={resourceLoadState === "error"}
+                editingItem={editingPlanningItem}
+                key={currentWeekStartDate}
+                onCreate={addPlanningItem}
+                onEditChange={updatePlanningItem}
+                onFlushPendingEdits={flushPendingPlanningItemSaves}
+                selectedCell={selectedCell}
+              />
 
-          {isPlannerEditMode ? (
-            <div className="rounded-md border border-perceel-line bg-white px-3 py-2 text-xs shadow-sm">
+              <div className="rounded-md border border-perceel-line bg-white px-3 py-2 text-xs shadow-sm">
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
               <span className="font-semibold text-slate-600">Werknemers</span>
               <button
@@ -1598,6 +1597,7 @@ export default function Home() {
                 ) : null}
               </div>
             ) : null}
+              </div>
             </div>
           ) : null}
 
@@ -1619,34 +1619,36 @@ export default function Home() {
             />
           ) : null}
 
-          <WeekPlanningBoard
-            activeDestinationCell={activeDestinationCell}
-            conflicts={conflicts}
-            days={days}
-            employeeAvailability={employeeAvailability}
-            employees={visibleEmployees}
-            items={visiblePlanningItems}
-            isEditingEnabled={isPlannerEditMode}
-            canMoveSelectedCard={canMoveSelectedCard}
-            onSetEditingEnabled={switchPlannerMode}
-            onDeleteCard={deletePlanningItem}
-            onGoToCurrentWeek={goToCurrentWeek}
-            onGoToNextWeek={goToNextWeek}
-            onGoToPreviousWeek={goToPreviousWeek}
-            onGoToWeekStartDate={goToWeekStartDate}
-            onSelectConflict={selectConflict}
-            onMoveSelectedCard={moveSelectedCardToActiveDestination}
-            onRemoveEmployeeFromWeek={removeEmployeeFromActiveWeek}
-            onSelectCard={selectPlanningCard}
-            onSelectCell={selectPlanningCell}
-            onSetSelectedCellAvailabilityType={setSelectedCellAvailabilityType}
-            onToggleSelectedCellAvailability={toggleSelectedCellAvailability}
-            resources={resources}
-            selectedCard={selectedCard}
-            selectedCell={selectedCell}
-            selectedCellAvailability={selectedCellAvailability}
-            weeklyEmployeeIds={activeWeeklyEmployeeIds}
-          />
+          <div className="relative z-0">
+            <WeekPlanningBoard
+              activeDestinationCell={activeDestinationCell}
+              conflicts={conflicts}
+              days={days}
+              employeeAvailability={employeeAvailability}
+              employees={visibleEmployees}
+              items={visiblePlanningItems}
+              isEditingEnabled={isPlannerEditMode}
+              canMoveSelectedCard={canMoveSelectedCard}
+              onSetEditingEnabled={switchPlannerMode}
+              onDeleteCard={deletePlanningItem}
+              onGoToCurrentWeek={goToCurrentWeek}
+              onGoToNextWeek={goToNextWeek}
+              onGoToPreviousWeek={goToPreviousWeek}
+              onGoToWeekStartDate={goToWeekStartDate}
+              onSelectConflict={selectConflict}
+              onMoveSelectedCard={moveSelectedCardToActiveDestination}
+              onRemoveEmployeeFromWeek={removeEmployeeFromActiveWeek}
+              onSelectCard={selectPlanningCard}
+              onSelectCell={selectPlanningCell}
+              onSetSelectedCellAvailabilityType={setSelectedCellAvailabilityType}
+              onToggleSelectedCellAvailability={toggleSelectedCellAvailability}
+              resources={resources}
+              selectedCard={selectedCard}
+              selectedCell={selectedCell}
+              selectedCellAvailability={selectedCellAvailability}
+              weeklyEmployeeIds={activeWeeklyEmployeeIds}
+            />
+          </div>
         </div>
         </section>
       </main>
