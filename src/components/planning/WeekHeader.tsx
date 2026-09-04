@@ -26,6 +26,7 @@ export function WeekHeader({ days }: WeekHeaderProps) {
       <div
         aria-hidden="true"
         className="sticky left-0 z-40 border-r border-slate-300 bg-slate-100 px-2 py-1.5 shadow-[3px_0_0_rgba(148,163,184,0.22)]"
+        data-planner-employee-column
       />
       {days.map((day) => (
         <div
