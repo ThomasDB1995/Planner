@@ -40,11 +40,17 @@ export async function addPlannerResourceFavorite(
     throw new Error("Supabase is niet ingesteld.");
   }
 
-  const { error } = await supabase.from("resource_favorites").upsert({
-    resource_id: resourceId,
-    created_by: user.id,
-    created_by_email: getPlannerAuditEmail(user)
-  });
+  const { error } = await supabase.from("resource_favorites").upsert(
+    {
+      resource_id: resourceId,
+      created_by: user.id,
+      created_by_email: getPlannerAuditEmail(user)
+    },
+    {
+      ignoreDuplicates: true,
+      onConflict: "resource_id"
+    }
+  );
 
   if (error) {
     throw error;

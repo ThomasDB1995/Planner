@@ -238,6 +238,7 @@ export function ResourceSelector({
             className="flex-1 rounded-md border border-perceel-line bg-white px-2 py-1.5 text-xs font-semibold text-slate-700 hover:bg-perceel-soft disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 sm:flex-none sm:py-1"
             disabled={selectorIsUnavailable}
             onClick={() => setIsOpen((currentValue) => !currentValue)}
+            onFocus={() => setFavoriteSaveError("")}
             type="button"
           >
             {selectedResources.length > 0 ? "Wijzig materieel" : "Kies materieel"}
@@ -274,6 +275,7 @@ export function ResourceSelector({
               <input
                 className="mt-0.5 w-full rounded-md border border-perceel-line bg-white px-2 py-0.5 text-xs normal-case text-slate-900"
                 onChange={(event) => setQuery(event.target.value)}
+                onFocus={() => setFavoriteSaveError("")}
                 placeholder="Nummer, groep, naam of merk"
                 type="search"
                 value={query}
@@ -284,9 +286,10 @@ export function ResourceSelector({
               Categorie
               <select
                 className="mt-0.5 w-full rounded-md border border-perceel-line bg-white px-2 py-0.5 text-xs normal-case text-slate-900"
-                onChange={(event) =>
+                onChange={(event) => {
+                  setFavoriteSaveError("");
                   setCategory(event.target.value as ResourceCategoryFilter)
-                }
+                }}
                 value={category}
               >
                 <option value="all">Alle</option>
@@ -302,7 +305,10 @@ export function ResourceSelector({
               Type
               <select
                 className="mt-0.5 w-full rounded-md border border-perceel-line bg-white px-2 py-0.5 text-xs normal-case text-slate-900"
-                onChange={(event) => setType(event.target.value)}
+                onChange={(event) => {
+                  setFavoriteSaveError("");
+                  setType(event.target.value);
+                }}
                 value={type}
               >
                 <option value="all">Alle</option>
