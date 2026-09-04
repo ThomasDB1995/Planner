@@ -6,9 +6,11 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Planner",
     description:
       "Werkplanning van maandag tot zondag per werknemer met materieel en conflictwaarschuwingen.",
+    id: "/",
     start_url: "/",
     scope: "/",
     display: "standalone",
+    orientation: "any",
     background_color: "#f5fbf7",
     theme_color: "#006b4e",
     categories: ["business", "productivity"],

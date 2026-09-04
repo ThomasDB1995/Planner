@@ -46,6 +46,7 @@ type WeekPlanningBoardProps = {
   onGoToNextWeek: () => void;
   onGoToPreviousWeek: () => void;
   onGoToWeekStartDate: (weekStartDate: string) => void;
+  onSelectConflict: (conflict: PlanningConflict) => void;
   onRemoveEmployeeFromWeek: (employeeId: string) => void;
   onSetSelectedCellAvailabilityType: (type: AvailabilityType) => void;
   onToggleSelectedCellAvailability: () => void;
@@ -122,6 +123,7 @@ export function WeekPlanningBoard({
   onGoToNextWeek,
   onGoToPreviousWeek,
   onGoToWeekStartDate,
+  onSelectConflict,
   onRemoveEmployeeFromWeek,
   onSetSelectedCellAvailabilityType,
   onToggleSelectedCellAvailability,
@@ -201,17 +203,28 @@ export function WeekPlanningBoard({
     });
   }
 
+  function focusMobileDate(date: string) {
+    if (!isMobilePlannerViewport()) {
+      return;
+    }
+
+    setMobileDateScrollRequest({
+      date,
+      requestId: Date.now()
+    });
+  }
+
   function goToToday() {
     const todayDate = getCurrentDateInputValue();
 
-    if (isMobilePlannerViewport()) {
-      setMobileDateScrollRequest({
-        date: todayDate,
-        requestId: Date.now()
-      });
-    }
+    focusMobileDate(todayDate);
 
     onGoToCurrentWeek();
+  }
+
+  function selectConflict(conflict: PlanningConflict) {
+    focusMobileDate(conflict.date);
+    onSelectConflict(conflict);
   }
 
   function submitWeekJump(event: React.FormEvent<HTMLFormElement>) {
@@ -356,6 +369,32 @@ export function WeekPlanningBoard({
               {weekJumpError}
             </p>
           ) : null}
+          <div className="mt-1 grid w-full grid-cols-7 gap-1 sm:hidden">
+            {days.map((day) => {
+              const isToday = day.date === getCurrentDateInputValue();
+              const isSelectedDay =
+                selectedCell?.date === day.date ||
+                mobileDateScrollRequest?.date === day.date;
+
+              return (
+                <button
+                  aria-label={`${day.dayLabel} tonen`}
+                  className={`h-8 rounded border text-[11px] font-bold ${
+                    isSelectedDay
+                      ? "border-perceel-green bg-perceel-green text-white"
+                      : isToday
+                        ? "border-emerald-200 bg-emerald-50 text-perceel-green"
+                        : "border-slate-200 bg-white text-slate-600"
+                  }`}
+                  key={day.date}
+                  onClick={() => focusMobileDate(day.date)}
+                  type="button"
+                >
+                  {day.dayLabel.slice(0, 2)}
+                </button>
+              );
+            })}
+          </div>
         </div>
         <div className="flex min-h-[34px] flex-wrap items-center justify-start gap-2 lg:justify-end lg:justify-self-end">
           {isEditingEnabled && selectedCell ? (
@@ -407,7 +446,10 @@ export function WeekPlanningBoard({
             </button>
           ) : null}
           <div className="flex shrink-0 items-center gap-2">
-            <ConflictSummary conflicts={conflicts} />
+            <ConflictSummary
+              conflicts={conflicts}
+              onSelectConflict={selectConflict}
+            />
           </div>
         </div>
       </div>

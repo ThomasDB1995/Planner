@@ -9,6 +9,7 @@ import type {
   SelectedPlanningCell
 } from "@/components/planning/matrix";
 import { PlanningForm } from "@/components/planning/PlanningForm";
+import { PlanningItemDetailPanel } from "@/components/planning/PlanningItemDetailPanel";
 import { WeekPlanningBoard } from "@/components/planning/WeekPlanningBoard";
 import { WorkCardPreview } from "@/components/planning/WorkCardPreview";
 import { employees } from "@/data/employees";
@@ -57,11 +58,18 @@ import {
   removePlannerWeeklyEmployee,
   subscribePlannerWeeklyEmployees
 } from "@/lib/supabase/weekly-employees";
-import type { PlanningItem, Resource } from "@/types/planning";
+import type { PlanningConflict, PlanningItem, Resource } from "@/types/planning";
 
 type ResourceLoadState = "idle" | "loading" | "ready" | "error";
 type EmployeeLoadState = "idle" | "loading" | "ready" | "error";
 type PlanningItemsLoadState = "idle" | "loading" | "ready" | "error";
+
+type PlannerUndoToast = {
+  id: string;
+  message: string;
+  actionLabel: string;
+  onUndo: () => void | Promise<void>;
+};
 
 const PULL_REFRESH_TRIGGER_DISTANCE = 72;
 
@@ -210,6 +218,14 @@ export default function Home() {
   const pullRefreshStartYRef = useRef(0);
   const pullRefreshDistanceRef = useRef(0);
   const pullRefreshIsActiveRef = useRef(false);
+  const undoToastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+  const editUndoBaselineRef = useRef<Record<string, PlanningItem>>({});
+  const editUndoNoticeTimeoutsRef = useRef<
+    Record<string, ReturnType<typeof setTimeout>>
+  >({});
+  const [undoToast, setUndoToast] = useState<PlannerUndoToast | null>(null);
   const [showHiddenEmployees, setShowHiddenEmployees] = useState(false);
   const [showWeekEmployeePanel, setShowWeekEmployeePanel] = useState(false);
   const [weekEmployeeToAddId, setWeekEmployeeToAddId] = useState("");
@@ -272,6 +288,16 @@ export default function Home() {
   const selectedPlanningItem = activeRelocationCard
     ? planningItems.find(
         (item) => item.id === activeRelocationCard.planningItemId
+      )
+    : undefined;
+  const selectedCardPlanningItem = selectedCard
+    ? visiblePlanningItems.find(
+        (item) => item.id === selectedCard.planningItemId
+      )
+    : undefined;
+  const selectedCardEmployee = selectedCardPlanningItem
+    ? visibleEmployees.find(
+        (employee) => employee.id === selectedCardPlanningItem.employeeId
       )
     : undefined;
   const editingPlanningItem = editingPlanningItemId
@@ -368,6 +394,116 @@ export default function Home() {
     pullRefreshDistanceRef.current = nextDistance;
     setPullRefreshDistance(nextDistance);
   }
+
+  function upsertPlanningItemInState(item: PlanningItem) {
+    setPlanningItems((currentItems) => {
+      const hasExistingItem = currentItems.some(
+        (currentItem) => currentItem.id === item.id
+      );
+
+      if (!hasExistingItem) {
+        return [...currentItems, item];
+      }
+
+      return currentItems.map((currentItem) =>
+        currentItem.id === item.id ? item : currentItem
+      );
+    });
+  }
+
+  function removePlanningItemFromState(planningItemId: string) {
+    setPlanningItems((currentItems) =>
+      currentItems.filter((item) => item.id !== planningItemId)
+    );
+  }
+
+  function showUndoToast(
+    message: string,
+    onUndo: PlannerUndoToast["onUndo"]
+  ) {
+    if (undoToastTimeoutRef.current) {
+      clearTimeout(undoToastTimeoutRef.current);
+    }
+
+    setUndoToast({
+      id: `undo-${Date.now()}`,
+      message,
+      actionLabel: "Ongedaan maken",
+      onUndo
+    });
+
+    undoToastTimeoutRef.current = setTimeout(() => {
+      setUndoToast(null);
+      undoToastTimeoutRef.current = null;
+    }, 7000);
+  }
+
+  function dismissUndoToast() {
+    if (undoToastTimeoutRef.current) {
+      clearTimeout(undoToastTimeoutRef.current);
+      undoToastTimeoutRef.current = null;
+    }
+
+    setUndoToast(null);
+  }
+
+  async function runUndoToast() {
+    const currentUndoToast = undoToast;
+
+    if (!currentUndoToast) {
+      return;
+    }
+
+    dismissUndoToast();
+
+    try {
+      await currentUndoToast.onUndo();
+      setPlanningSaveError("");
+    } catch {
+      setPlanningSaveError(
+        "Ongedaan maken is niet opgeslagen. Controleer de planning."
+      );
+    }
+  }
+
+  function scheduleEditUndoToast(previousItem: PlanningItem) {
+    if (!editUndoBaselineRef.current[previousItem.id]) {
+      editUndoBaselineRef.current[previousItem.id] = previousItem;
+    }
+
+    clearTimeout(editUndoNoticeTimeoutsRef.current[previousItem.id]);
+
+    editUndoNoticeTimeoutsRef.current[previousItem.id] = setTimeout(() => {
+      const undoItem = editUndoBaselineRef.current[previousItem.id];
+
+      delete editUndoBaselineRef.current[previousItem.id];
+      delete editUndoNoticeTimeoutsRef.current[previousItem.id];
+
+      if (!undoItem) {
+        return;
+      }
+
+      showUndoToast("Planningitem gewijzigd.", async () => {
+        upsertPlanningItemInState(undoItem);
+
+        if (shouldPersistPlanningItems()) {
+          await updatePlannerPlanningItem(undoItem, auditUser);
+        }
+      });
+    }, 900);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (undoToastTimeoutRef.current) {
+        clearTimeout(undoToastTimeoutRef.current);
+      }
+
+      Object.values(editUndoNoticeTimeoutsRef.current).forEach((timeout) =>
+        clearTimeout(timeout)
+      );
+    };
+  }, []);
 
   useEffect(() => {
     if (!hasSupabaseConnection || !authSession) {
@@ -786,7 +922,7 @@ export default function Home() {
   }
 
   async function addPlanningItem(item: Omit<PlanningItem, "id">) {
-    const nextItem = {
+    let nextItem: PlanningItem = {
       ...item,
       id: createPlanningItemId(),
       createdBy: auditUser?.id,
@@ -798,18 +934,36 @@ export default function Home() {
     setPlanningItems((currentItems) => [...currentItems, nextItem]);
     setPlanningSaveError("");
 
-    if (!shouldPersistPlanningItems()) {
+    const shouldPersist = shouldPersistPlanningItems();
+
+    if (!shouldPersist) {
+      showUndoToast("Planningitem toegevoegd.", () => {
+        removePlanningItemFromState(nextItem.id);
+      });
       return;
     }
 
     try {
       const savedItem = await createPlannerPlanningItem(nextItem, auditUser);
+      nextItem = savedItem;
 
       setPlanningItems((currentItems) =>
         currentItems.map((currentItem) =>
           currentItem.id === nextItem.id ? savedItem : currentItem
         )
       );
+      showUndoToast("Planningitem toegevoegd.", async () => {
+        removePlanningItemFromState(savedItem.id);
+
+        if (shouldPersistPlanningItems()) {
+          try {
+            await deletePlannerPlanningItem(savedItem.id);
+          } catch (error) {
+            upsertPlanningItemInState(savedItem);
+            throw error;
+          }
+        }
+      });
     } catch {
       setPlanningItems((currentItems) =>
         currentItems.filter((currentItem) => currentItem.id !== nextItem.id)
@@ -818,6 +972,7 @@ export default function Home() {
         "Planningitem niet opgeslagen. Probeer opnieuw of controleer de verbinding."
       );
     }
+
   }
 
   function clearPlannerSelection() {
@@ -980,6 +1135,7 @@ export default function Home() {
         item.id === planningItemId ? updatedItem : item
       )
     );
+    scheduleEditUndoToast(currentItem);
     persistPlanningItemUpdate(updatedItem, debounce);
   }
 
@@ -1009,13 +1165,32 @@ export default function Home() {
       currentEditingItemId === planningItemId ? null : currentEditingItemId
     );
 
-    if (!deletedItem || !shouldPersistPlanningItems()) {
+    if (!deletedItem) {
+      return;
+    }
+
+    if (!shouldPersistPlanningItems()) {
+      showUndoToast("Planningitem verwijderd.", () => {
+        upsertPlanningItemInState(deletedItem);
+      });
       return;
     }
 
     try {
       await deletePlannerPlanningItem(planningItemId);
       setPlanningSaveError("");
+      showUndoToast("Planningitem verwijderd.", async () => {
+        upsertPlanningItemInState(deletedItem);
+
+        if (shouldPersistPlanningItems()) {
+          try {
+            await createPlannerPlanningItem(deletedItem, auditUser);
+          } catch (error) {
+            removePlanningItemFromState(deletedItem.id);
+            throw error;
+          }
+        }
+      });
     } catch {
       setPlanningItems((currentItems) => [...currentItems, deletedItem]);
       setPlanningSaveError(
@@ -1024,11 +1199,54 @@ export default function Home() {
     }
   }
 
-  function selectPlanningCard(card: SelectedPlanningCard) {
+  function selectPlanningCardById(planningItemId: string) {
+    const item = visiblePlanningItems.find(
+      (visibleItem) => visibleItem.id === planningItemId
+    );
+
+    if (!item) {
+      return;
+    }
+
+    const card = { planningItemId };
+
     setSelectedCard(card);
-    setRelocationSourceCard(card);
-    setEditingPlanningItemId(card.planningItemId);
+    setSelectedCell({
+      employeeId: item.employeeId,
+      date: item.date
+    });
     setActiveDestinationCell(null);
+
+    if (isPlannerEditMode) {
+      setRelocationSourceCard(card);
+      setEditingPlanningItemId(planningItemId);
+      return;
+    }
+
+    setRelocationSourceCard(null);
+    setEditingPlanningItemId(null);
+  }
+
+  function selectPlanningCard(card: SelectedPlanningCard) {
+    selectPlanningCardById(card.planningItemId);
+  }
+
+  function selectConflict(conflict: PlanningConflict) {
+    const planningItemId = conflict.planningItemIds.find((itemId) =>
+      visiblePlanningItems.some((item) => item.id === itemId)
+    );
+
+    if (!planningItemId) {
+      return;
+    }
+
+    selectPlanningCardById(planningItemId);
+  }
+
+  function closePlanningItemDetail() {
+    setSelectedCard(null);
+    setRelocationSourceCard(null);
+    setEditingPlanningItemId(null);
   }
 
   function selectPlanningCell(cell: SelectedPlanningCell) {
@@ -1165,6 +1383,18 @@ export default function Home() {
       )
     );
     persistPlanningItemUpdate(movedItem, false);
+    showUndoToast("Planningitem verplaatst.", async () => {
+      upsertPlanningItemInState(selectedPlanningItem);
+
+      if (shouldPersistPlanningItems()) {
+        try {
+          await updatePlannerPlanningItem(selectedPlanningItem, auditUser);
+        } catch (error) {
+          upsertPlanningItemInState(movedItem);
+          throw error;
+        }
+      }
+    });
     setActiveDestinationCell(null);
     setRelocationSourceCard(null);
     setSelectedCard(null);
@@ -1172,10 +1402,32 @@ export default function Home() {
 
   return (
     <AuthGate onSessionChange={handleAuthSessionChange}>
-      <main className="min-h-screen bg-perceel-soft px-3 pb-5 pt-3 sm:px-5 sm:py-4 lg:px-6">
+      <main className="min-h-screen bg-perceel-soft px-3 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-3 sm:px-5 sm:py-4 lg:px-6">
         {pullRefreshDistance > 0 || isPlannerRefreshing ? (
           <div className="fixed left-1/2 top-2 z-50 -translate-x-1/2 rounded-full border border-emerald-100 bg-white/95 px-3 py-1 text-xs font-semibold text-perceel-green shadow-sm">
             {pullRefreshLabel}
+          </div>
+        ) : null}
+        {undoToast ? (
+          <div className="fixed left-3 right-3 top-3 z-50 flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-lg sm:left-auto sm:w-[360px]">
+            <span className="min-w-0 truncate">{undoToast.message}</span>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <button
+                className="rounded border border-perceel-green bg-white px-2 py-1 text-xs font-bold text-perceel-green hover:bg-emerald-50"
+                onClick={runUndoToast}
+                type="button"
+              >
+                {undoToast.actionLabel}
+              </button>
+              <button
+                aria-label="Melding sluiten"
+                className="rounded border border-transparent px-1.5 py-1 text-xs font-bold text-slate-400 hover:border-slate-200 hover:text-slate-600"
+                onClick={dismissUndoToast}
+                type="button"
+              >
+                ×
+              </button>
+            </div>
           </div>
         ) : null}
         <section className="mx-auto max-w-[1500px]">
@@ -1358,6 +1610,15 @@ export default function Home() {
             />
           ) : null}
 
+          {!isPlannerEditMode && selectedCardPlanningItem && selectedCardEmployee ? (
+            <PlanningItemDetailPanel
+              employee={selectedCardEmployee}
+              item={selectedCardPlanningItem}
+              onClose={closePlanningItemDetail}
+              resources={resources}
+            />
+          ) : null}
+
           <WeekPlanningBoard
             activeDestinationCell={activeDestinationCell}
             conflicts={conflicts}
@@ -1373,6 +1634,7 @@ export default function Home() {
             onGoToNextWeek={goToNextWeek}
             onGoToPreviousWeek={goToPreviousWeek}
             onGoToWeekStartDate={goToWeekStartDate}
+            onSelectConflict={selectConflict}
             onMoveSelectedCard={moveSelectedCardToActiveDestination}
             onRemoveEmployeeFromWeek={removeEmployeeFromActiveWeek}
             onSelectCard={selectPlanningCard}

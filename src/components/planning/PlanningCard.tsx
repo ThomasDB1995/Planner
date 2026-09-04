@@ -51,20 +51,27 @@ export function PlanningCard({
 
   return (
     <article
-      className={`relative border-l-4 border-slate-300 bg-white px-1.5 py-0.5 text-xs leading-4 text-slate-700 ${
+      className={`relative cursor-pointer border-l-4 border-slate-300 bg-white px-1.5 py-0.5 text-xs leading-4 text-slate-700 ${
         isEditingEnabled || auditInitial ? "pr-6" : ""
       } ${
         auditInitial ? "pb-3" : ""
       } ${selectedStyle}`}
       data-selected={isSelected ? "true" : "false"}
       onClick={(event) => {
-        if (!isEditingEnabled) {
-          return;
-        }
-
         event.stopPropagation();
         onSelect();
       }}
+      onKeyDown={(event) => {
+        if (event.key !== "Enter" && event.key !== " ") {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        onSelect();
+      }}
+      role="button"
+      tabIndex={0}
     >
       <p className="truncate font-semibold text-slate-950" title={item.taskName}>
         {item.taskName}

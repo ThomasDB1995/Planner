@@ -169,9 +169,7 @@ export function PlanningCell({
               conflict.planningItemIds.includes(item.id)
             )}
             isEditingEnabled={isEditingEnabled}
-            isSelected={
-              isEditingEnabled && selectedCard?.planningItemId === item.id
-            }
+            isSelected={selectedCard?.planningItemId === item.id}
             item={item}
             key={item.id}
             onDelete={() => onDeleteCard(item.id)}

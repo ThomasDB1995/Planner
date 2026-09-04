@@ -14,10 +14,12 @@
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
   overscroll-behavior-x: none;
   overscroll-behavior-y: contain;
   font-family: Arial, Helvetica, sans-serif;
+  background: #f4f7f4;
 }
 
 button,
