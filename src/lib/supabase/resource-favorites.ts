@@ -1,8 +1,5 @@
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import {
-  getPlannerAuditEmail,
-  type PlannerAuditUser
-} from "@/lib/supabase/audit";
+import type { PlannerAuditUser } from "@/lib/supabase/audit";
 
 type SupabaseResourceFavoriteRow = {
   resource_id: string;
@@ -32,7 +29,7 @@ export async function fetchPlannerResourceFavoriteIds(): Promise<string[]> {
 
 export async function addPlannerResourceFavorite(
   resourceId: string,
-  user: PlannerAuditUser
+  _user: PlannerAuditUser
 ): Promise<void> {
   const supabase = getSupabaseBrowserClient();
 
@@ -40,19 +37,25 @@ export async function addPlannerResourceFavorite(
     throw new Error("Supabase is niet ingesteld.");
   }
 
-  const { error } = await supabase.from("resource_favorites").upsert(
-    {
-      resource_id: resourceId,
-      created_by: user.id,
-      created_by_email: getPlannerAuditEmail(user)
-    },
-    {
-      ignoreDuplicates: true,
-      onConflict: "resource_id"
-    }
-  );
+  const { data: existingFavorite, error: lookupError } = await supabase
+    .from("resource_favorites")
+    .select("resource_id")
+    .eq("resource_id", resourceId)
+    .maybeSingle();
 
-  if (error) {
+  if (lookupError) {
+    throw lookupError;
+  }
+
+  if (existingFavorite) {
+    return;
+  }
+
+  const { error } = await supabase
+    .from("resource_favorites")
+    .insert({ resource_id: resourceId });
+
+  if (error && error.code !== "23505") {
     throw error;
   }
 }
