@@ -6,6 +6,8 @@ type PlanningCardProps = {
   resources: Resource[];
   conflicts: PlanningConflict[];
   isSelected: boolean;
+  isWeekend?: boolean;
+  rowTone?: "plain" | "soft";
   isEditingEnabled?: boolean;
   onDragEnd?: () => void;
   onDragStart?: () => void;
@@ -27,6 +29,8 @@ export function PlanningCard({
   resources,
   conflicts,
   isSelected,
+  isWeekend = false,
+  rowTone = "plain",
   isEditingEnabled = true,
   onDragEnd,
   onDragStart,
@@ -47,6 +51,11 @@ export function PlanningCard({
   const auditEmail = item.updatedByEmail ?? item.createdByEmail ?? "";
   const auditInitial = auditEmail ? getUserInitial(auditEmail) : "";
   const isOption = item.status === "voorlopig";
+  const confirmedSurfaceStyle = isWeekend
+    ? "border-slate-300 bg-slate-200/55 ring-1 ring-inset ring-white/45"
+    : rowTone === "soft"
+      ? "border-slate-300 bg-slate-100/80 ring-1 ring-inset ring-white/55"
+      : "border-slate-300 bg-white/75 ring-1 ring-inset ring-slate-100";
   const auditTitle = [
     item.createdByEmail ? `Aangemaakt door ${item.createdByEmail}` : "",
     item.updatedByEmail ? `Gewijzigd door ${item.updatedByEmail}` : ""
@@ -59,7 +68,7 @@ export function PlanningCard({
       className={`relative cursor-pointer border-l-4 px-1.5 py-0.5 text-xs leading-4 text-slate-700 shadow-[0_1px_2px_rgba(15,23,42,0.08)] ${
         isOption
           ? "border-amber-400 border-y border-r border-dashed border-y-amber-200 border-r-amber-200 bg-amber-50/55"
-          : "border-slate-300 bg-slate-50/90 ring-1 ring-inset ring-white/75"
+          : confirmedSurfaceStyle
       } ${
         isEditingEnabled || auditInitial ? "pr-6" : ""
       } ${
