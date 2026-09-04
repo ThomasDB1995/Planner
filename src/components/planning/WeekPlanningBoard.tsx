@@ -455,7 +455,7 @@ export function WeekPlanningBoard({
       </div>
 
       <div
-        className="snap-x snap-mandatory scroll-pl-[116px] overflow-x-auto overscroll-x-none rounded-md border border-slate-300 bg-white shadow-sm sm:snap-none sm:scroll-pl-0"
+        className="relative z-0 isolate snap-x snap-mandatory scroll-pl-[116px] overflow-x-auto overscroll-x-none rounded-md border border-slate-300 bg-white shadow-sm sm:snap-none sm:scroll-pl-0"
         ref={gridScrollerRef}
       >
         <WeekHeader days={days} />
