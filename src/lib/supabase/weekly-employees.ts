@@ -52,7 +52,8 @@ export async function addPlannerWeeklyEmployee(
       created_by: user.id,
       created_by_email: getPlannerAuditEmail(user)
     },
-    { onConflict: "week_key,employee_id" }
+    // A repeated addition is a no-op; keep the original creator and avoid UPDATE permissions.
+    { onConflict: "week_key,employee_id", ignoreDuplicates: true }
   );
 
   if (error) {
