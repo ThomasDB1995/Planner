@@ -126,7 +126,7 @@ export function PlanningForm({
     });
     wasEditingRef.current = true;
     setError("");
-    taskNameInputRef.current?.focus();
+    // Keep focus on the selected card for keyboard task actions.
   }, [editingItem]);
 
   function updateField<K extends keyof PlanningFormState>(

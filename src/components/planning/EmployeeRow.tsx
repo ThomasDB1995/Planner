@@ -15,6 +15,7 @@ import type {
 } from "@/types/planning";
 
 type EmployeeRowProps = {
+  cutItemId?: string;
   employee: Employee;
   rowIndex: number;
   employeeAvailability: EmployeeAvailability[];
@@ -60,6 +61,7 @@ function getEmployeeNameParts(employee: Employee): {
 }
 
 export function EmployeeRow({
+  cutItemId,
   employee,
   rowIndex,
   employeeAvailability,
@@ -129,6 +131,7 @@ export function EmployeeRow({
       </div>
       {days.map((day) => (
         <PlanningCell
+          cutItemId={cutItemId}
           conflicts={conflicts}
           date={day.date}
           employeeId={employee.id}

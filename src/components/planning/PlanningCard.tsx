@@ -2,6 +2,7 @@ import type { PlanningConflict, PlanningItem, Resource } from "@/types/planning"
 import { getResourceDisplayLabel } from "@/lib/planning/resources";
 
 type PlanningCardProps = {
+  isCut?: boolean;
   item: PlanningItem;
   resources: Resource[];
   conflicts: PlanningConflict[];
@@ -23,6 +24,7 @@ function getUserInitial(email: string): string {
 }
 
 export function PlanningCard({
+  isCut = false,
   item,
   resources,
   conflicts,
@@ -64,7 +66,8 @@ export function PlanningCard({
         isEditingEnabled || auditInitial ? "pr-6" : ""
       } ${
         auditInitial ? "pb-3" : ""
-      } ${selectedStyle}`}
+      } ${selectedStyle} ${isCut ? "opacity-40" : ""}`}
+      data-cut={isCut || undefined}
       data-selected={isSelected ? "true" : "false"}
       data-status={item.status}
       draggable={isEditingEnabled}

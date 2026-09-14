@@ -25,6 +25,8 @@ import type {
 } from "@/types/planning";
 
 type WeekPlanningBoardProps = {
+  taskActions?: React.ReactNode;
+  cutItemId?: string;
   days: WeekDay[];
   employees: Employee[];
   employeeAvailability: EmployeeAvailability[];
@@ -122,6 +124,8 @@ function getDefaultMobileDate(
 }
 
 export function WeekPlanningBoard({
+  taskActions,
+  cutItemId,
   days,
   employees,
   employeeAvailability,
@@ -545,6 +549,7 @@ export function WeekPlanningBoard({
         </div>
       </div>
 
+      {taskActions}
       <div
         className="relative z-0 isolate snap-x snap-mandatory scroll-pl-[116px] overflow-x-auto overscroll-x-none rounded-md border border-slate-300 bg-white shadow-sm sm:snap-none sm:scroll-pl-0"
         data-planner-day-scroller
@@ -569,6 +574,7 @@ export function WeekPlanningBoard({
                 </div>
               ) : null}
               <EmployeeRow
+                cutItemId={cutItemId}
                 conflicts={conflicts}
                 days={days}
                 employee={employee}

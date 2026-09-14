@@ -9,6 +9,8 @@ import type {
   SelectedPlanningCell
 } from "@/components/planning/matrix";
 import { PlanningForm } from "@/components/planning/PlanningForm";
+import { PlanningClipboardToolbar } from "@/components/planning/PlanningClipboardToolbar";
+import { usePlanningClipboard } from "@/components/planning/usePlanningClipboard";
 import { PlanningItemDetailPanel } from "@/components/planning/PlanningItemDetailPanel";
 import { WeekPlanningBoard } from "@/components/planning/WeekPlanningBoard";
 import { WorkCardPreview } from "@/components/planning/WorkCardPreview";
@@ -224,6 +226,7 @@ export default function Home() {
     Record<string, ReturnType<typeof setTimeout>>
   >({});
   const pendingPlanningItemSavesRef = useRef<Record<string, PlanningItem>>({});
+  const inFlightPlanningItemSavesRef = useRef<Record<string, Promise<boolean>>>({});
   const pullRefreshStartXRef = useRef(0);
   const pullRefreshStartYRef = useRef(0);
   const pullRefreshDistanceRef = useRef(0);
@@ -337,6 +340,24 @@ export default function Home() {
         (employee) => employee.id === activeDestinationCell.employeeId
       )
     : undefined;
+  const planningClipboard = usePlanningClipboard({
+    enabled: isPlannerEditMode,
+    ready: planningItemsLoadState === "ready" && Boolean(selectedCellEmployee),
+    user: auditUser,
+    selectedItem: selectedCardPlanningItem,
+    destination: selectedCell,
+    flushEdits: flushPendingPlanningItemSaves,
+    onSaved: upsertPlanningItemInState,
+    onStarted: () => {
+      if (selectedCardPlanningItem) {
+        clearTimeout(editUndoNoticeTimeoutsRef.current[selectedCardPlanningItem.id]);
+        delete editUndoNoticeTimeoutsRef.current[selectedCardPlanningItem.id];
+        delete editUndoBaselineRef.current[selectedCardPlanningItem.id];
+      }
+      dismissUndoToast();
+      clearPlannerSelection();
+    }
+  });
   const actionContext =
     selectedPlanningItem && activeDestinationCell
       ? {
@@ -909,10 +930,12 @@ export default function Home() {
 
   function savePlanningItemNow(item: PlanningItem) {
     if (!auditUser) {
-      return;
+      return Promise.resolve(false);
     }
 
-    updatePlannerPlanningItem(item, auditUser)
+    // Serialize saves per task so an earlier edit cannot undo a later paste.
+    const previousSave = inFlightPlanningItemSavesRef.current[item.id];
+    const save = Promise.resolve(previousSave).then(() => updatePlannerPlanningItem(item, auditUser))
       .then((savedItem) => {
         setPlanningItems((currentItems) =>
           currentItems.map((currentItem) =>
@@ -920,12 +943,24 @@ export default function Home() {
           )
         );
         setPlanningSaveError("");
+        return true;
       })
       .catch(() => {
+        if (inFlightPlanningItemSavesRef.current[item.id] === save && !pendingPlanningItemSavesRef.current[item.id]) {
+          pendingPlanningItemSavesRef.current[item.id] = item;
+        }
         setPlanningSaveError(
           "Planningwijziging niet opgeslagen. Herlaad niet voor je dit controleert."
         );
+        return false;
       });
+    inFlightPlanningItemSavesRef.current[item.id] = save;
+    void save.then(() => {
+      if (inFlightPlanningItemSavesRef.current[item.id] === save) {
+        delete inFlightPlanningItemSavesRef.current[item.id];
+      }
+    });
+    return save;
   }
 
   function persistPlanningItemUpdate(item: PlanningItem, debounce = true) {
@@ -958,13 +993,15 @@ export default function Home() {
     planningItemSaveTimeoutsRef.current[item.id] = setTimeout(persist, 500);
   }
 
-  function flushPendingPlanningItemSaves() {
+  async function flushPendingPlanningItemSaves(): Promise<boolean> {
     Object.values(pendingPlanningItemSavesRef.current).forEach((item) => {
       clearTimeout(planningItemSaveTimeoutsRef.current[item.id]);
       delete planningItemSaveTimeoutsRef.current[item.id];
       delete pendingPlanningItemSavesRef.current[item.id];
       savePlanningItemNow(item);
     });
+    const results = await Promise.all(Object.values(inFlightPlanningItemSavesRef.current));
+    return results.every(Boolean);
   }
 
   async function addPlanningItem(item: Omit<PlanningItem, "id">) {
@@ -1161,6 +1198,7 @@ export default function Home() {
     updates: Partial<Pick<PlanningItem, "taskName" | "resourceIds" | "status">>,
     debounce = true
   ) {
+    if (planningClipboard.busy) return;
     const currentItem = planningItems.find((item) => item.id === planningItemId);
 
     if (!currentItem) {
@@ -1186,6 +1224,7 @@ export default function Home() {
   }
 
   async function deletePlanningItem(planningItemId: string) {
+    if (planningClipboard.busy) return;
     const deletedItem = planningItems.find((item) => item.id === planningItemId);
 
     clearTimeout(planningItemSaveTimeoutsRef.current[planningItemId]);
@@ -1263,7 +1302,7 @@ export default function Home() {
     });
     setActiveDestinationCell(null);
 
-    if (isPlannerEditMode) {
+    if (isPlannerEditMode && !planningClipboard.clipboard) {
       setRelocationSourceCard(card);
       setEditingPlanningItemId(planningItemId);
       return;
@@ -1298,6 +1337,13 @@ export default function Home() {
   function selectPlanningCell(cell: SelectedPlanningCell) {
     setSelectedCell(cell);
     setEditingPlanningItemId(null);
+
+    if (planningClipboard.clipboard) {
+      setSelectedCard(null);
+      setRelocationSourceCard(null);
+      setActiveDestinationCell(null);
+      return;
+    }
 
     if (selectedCard) {
       setRelocationSourceCard(selectedCard);
@@ -1410,6 +1456,7 @@ export default function Home() {
     planningItemId: string,
     destinationCell: SelectedPlanningCell
   ) {
+    if (planningClipboard.busy) return;
     const currentItem = planningItems.find((item) => item.id === planningItemId);
 
     if (!currentItem) {
@@ -1515,6 +1562,8 @@ export default function Home() {
 
           {isPlannerEditMode ? (
             <div className="relative z-40 space-y-3">
+              {!planningClipboard.clipboard ? (
+              <fieldset disabled={planningClipboard.busy} className="min-w-0">
               <PlanningForm
                 actionContext={actionContext}
                 auditUser={auditUser}
@@ -1529,6 +1578,8 @@ export default function Home() {
                 onFlushPendingEdits={flushPendingPlanningItemSaves}
                 selectedCell={selectedCell}
               />
+              </fieldset>
+              ) : null}
 
               <div className="rounded-md border border-perceel-line bg-white px-3 py-2 text-xs shadow-sm">
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
@@ -1696,6 +1747,14 @@ export default function Home() {
 
           <div className="relative z-0">
             <WeekPlanningBoard
+              cutItemId={planningClipboard.clipboard?.mode === "cut" ? planningClipboard.clipboard.item.id : undefined}
+              taskActions={isPlannerEditMode ? (
+                <PlanningClipboardToolbar
+                  controller={planningClipboard}
+                  selectedItem={selectedCardPlanningItem}
+                  destinationLabel={selectedCell && selectedCellEmployee ? `${getEmployeeDisplayName(selectedCellEmployee)} - ${selectedCell.date}` : undefined}
+                />
+              ) : null}
               activeDestinationCell={activeDestinationCell}
               conflicts={conflicts}
               days={days}

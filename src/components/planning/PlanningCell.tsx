@@ -19,6 +19,7 @@ import type {
 } from "@/types/planning";
 
 type PlanningCellProps = {
+  cutItemId?: string;
   employeeId: string;
   date: string;
   isWeekend?: boolean;
@@ -86,6 +87,7 @@ function getAvailabilityCellStateStyle(
 }
 
 export function PlanningCell({
+  cutItemId,
   employeeId,
   date,
   isWeekend = false,
@@ -204,6 +206,7 @@ export function PlanningCell({
         ) : null}
         {cellItems.map((item) => (
           <PlanningCard
+            isCut={cutItemId === item.id}
             conflicts={conflicts.filter((conflict) =>
               conflict.planningItemIds.includes(item.id)
             )}

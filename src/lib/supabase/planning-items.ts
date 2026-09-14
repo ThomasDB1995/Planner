@@ -179,6 +179,38 @@ export async function deletePlannerPlanningItem(id: string): Promise<void> {
   }
 }
 
+export async function movePlannerPlanningItem(
+  id: string,
+  destination: { employeeId: string; date: string },
+  user: PlannerAuditUser
+): Promise<PlanningItem> {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) throw new Error("Supabase is niet ingesteld.");
+
+  // Only move the location; preserve edits made by other users since cutting.
+  const { data, error } = await supabase.from("planning_items")
+    .update({
+      employee_id: destination.employeeId,
+      date: destination.date,
+      updated_by: user.id,
+      updated_by_email: getPlannerAuditEmail(user)
+    })
+    .eq("id", id)
+    .select(planningItemSelect)
+    .single();
+  if (error) throw error;
+  return mapPlanningItemRow(data as SupabasePlanningItemRow);
+}
+
+export async function fetchPlannerPlanningItem(id: string): Promise<PlanningItem> {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) throw new Error("Supabase is niet ingesteld.");
+  const { data, error } = await supabase.from("planning_items")
+    .select(planningItemSelect).eq("id", id).single();
+  if (error) throw error;
+  return mapPlanningItemRow(data as SupabasePlanningItemRow);
+}
+
 export function subscribePlannerPlanningItems(
   onChange: (change: PlanningItemChange) => void
 ): () => void {
