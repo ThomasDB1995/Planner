@@ -20,7 +20,7 @@ Geen actief implementatieticket. Sprint 32 T3201, T3202 en T3203 zijn afgerond e
 
 ## Completed
 
-- Praktijkuitbreiding 2026-09-14: knippen, kopieren en plakken van taken binnen en tussen weken in bewerkmodus. Inclusief mobiele actiebalk, desktopsneltoetsen, behoud van machines/status, nieuwe aanmaker bij kopie en opslagcontrole voor verplaatsen. Zie `docs/QA_PLANNING_CLIPBOARD.md`.
+- Praktijkuitbreiding 2026-09-14: knippen, kopieren en plakken van taken binnen en tussen weken in bewerkmodus via Ctrl/Cmd+X/C/V, zonder aparte actiebalk. Inclusief behoud van machines/status, nieuwe aanmaker bij kopie en opslagcontrole voor verplaatsen. Zie `docs/QA_PLANNING_CLIPBOARD.md`.
 - Praktijkfix 2026-09-14: resourceconflicts tellen verschillende werknemers per machine en datum. Meerdere taken met dezelfde machine bij dezelfde werknemer zijn toegestaan zonder waarschuwing. Regressietests: `node --test scripts/test-planning-conflicts.cjs`.
 - Sprint 32 Work Card Read-Only Preview afgerond
 - `WorkCardPreview` toegevoegd als compacte read-only werkkaart voor geselecteerde werknemer/dag

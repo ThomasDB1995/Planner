@@ -4,16 +4,19 @@ Datum: 2026-09-14
 
 ## Gebruik
 
-In Bewerken: selecteer een taak, kies Knippen of Kopieren, navigeer eventueel
-naar een andere week, selecteer een doelcel en kies Hier plakken.
+In Bewerken: selecteer een taak, druk Ctrl/Cmd+X (knippen) of Ctrl/Cmd+C
+(kopieren), navigeer eventueel naar een andere week, selecteer een doelcel
+en druk Ctrl/Cmd+V. Er is geen aparte actiebalk in de planner.
 
 - Knippen dimt de bron; de taak verhuist pas na bevestigde opslag.
 - Kopieren behoudt de bron en ondersteunt herhaald plakken met nieuwe IDs.
 - Taakomschrijving, status en alle machines blijven behouden. De doelcel bepaalt
   werknemer en datum. Een kopie krijgt de huidige gebruiker als aanmaker.
-- Tijdens de keuze van een bestemming is het invoerformulier tijdelijk verborgen.
+- Het invoerformulier blijft zichtbaar. Het neemt tijdens het kiezen van een
+  bestemming niet automatisch de toetsenbordfocus over.
+- Een korte bevestigingsmelding verdwijnt automatisch na 2,5 seconden.
 - Ctrl/Cmd+X, C en V werken buiten tekstvelden; Escape annuleert.
-- Annuleren en overschakelen naar Bekijken wissen het tijdelijke klembord.
+- Escape en overschakelen naar Bekijken wissen het tijdelijke klembord.
 - Het klembord blijft bewaard bij weeknavigatie en weekjump, maar niet na herladen
   of wisselen van gebruiker. Het gebruikt niet het systeemklembord.
 
@@ -24,14 +27,14 @@ naar een andere week, selecteer een doelcel en kies Hier plakken.
 - `src/components/planning/usePlanningClipboard.ts`: sessiegebonden state,
   sneltoetsen, wacht op lopende edits, blokkeert gelijktijdig plakken en houdt de
   kopie-ID bij voor herhalen na een verloren antwoord.
-- `PlanningClipboardToolbar.tsx`: compacte actiebalk bij de kalender.
+- `PlanningClipboardToolbar.tsx` en de bijbehorende knoppen zijn verwijderd.
 - `page.tsx`: integratie en seriele opslag per taak, met afwachtbare edit-flush.
-- `WeekPlanningBoard`, `EmployeeRow`, `PlanningCell` en `PlanningCard`: actiebalk
-  en dimmen van de geknipte kaart. `PlanningForm` behoudt focus op de gekozen kaart.
+- `WeekPlanningBoard`, `EmployeeRow`, `PlanningCell` en `PlanningCard`: dimmen
+  van de geknipte kaart. `PlanningForm` behoudt focus op de gekozen kaart/doelcel.
 - `src/lib/supabase/planning-items.ts`: verplaatsen wijzigt uitsluitend locatie
   en wijzigingsaudit. Een inmiddels verwijderde taak wordt niet opnieuw aangemaakt;
   tussentijdse wijzigingen van andere gebruikers worden niet overschreven.
-- Lucide-iconen toegevoegd via `lucide-react`. Geen database- of beleidswijziging.
+- De ongebruikte dependency `lucide-react` is verwijderd. Geen database- of beleidswijziging.
 
 ## QA
 
@@ -52,6 +55,9 @@ Geslaagd:
 - Verloren antwoord na insert: herhalen gebruikt dezelfde ID, zonder extra kopie.
 - Verwijderde brontaak wordt niet opnieuw aangemaakt door plakken.
 - Normale tekstveld-shortcuts, annuleren, en reset bij Bekijken.
+- Alle taakacties via toetsenbord getest; geen Knippen/Kopieren/Plakken-knoppen aanwezig.
+- Ctrl en Cmd voor kopieren gecontroleerd. Mobiel vereist voor deze taakacties
+  een aangesloten toetsenbord; de gewone plannerbediening blijft beschikbaar.
 - Desktop (1440px) en mobiel (390px): screenshots gecontroleerd; geen pagina-overflow.
 - Bestaande zes conflictregressietests geslaagd.
 - Productiebuild inclusief TypeScript-controle geslaagd.

@@ -36,6 +36,7 @@ type PlanningFormProps = {
   ) => void;
   onFlushPendingEdits?: () => void;
   selectedCell: SelectedPlanningCell | null;
+  suppressAutoFocus?: boolean;
 };
 
 type PlanningFormState = {
@@ -73,7 +74,8 @@ export function PlanningForm({
   onCreate,
   onEditChange,
   onFlushPendingEdits,
-  selectedCell
+  selectedCell,
+  suppressAutoFocus = false
 }: PlanningFormProps) {
   const [formState, setFormState] = useState<PlanningFormState>(initialFormState);
   const [error, setError] = useState("");
@@ -109,8 +111,8 @@ export function PlanningForm({
       status: shouldResetEditFields ? "bevestigd" : currentState.status
     }));
     wasEditingRef.current = false;
-    taskNameInputRef.current?.focus();
-  }, [isEditMode, selectedCell]);
+    if (!suppressAutoFocus) taskNameInputRef.current?.focus();
+  }, [isEditMode, selectedCell, suppressAutoFocus]);
 
   useEffect(() => {
     if (!editingItem) {

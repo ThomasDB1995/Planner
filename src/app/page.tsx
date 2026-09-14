@@ -9,7 +9,6 @@ import type {
   SelectedPlanningCell
 } from "@/components/planning/matrix";
 import { PlanningForm } from "@/components/planning/PlanningForm";
-import { PlanningClipboardToolbar } from "@/components/planning/PlanningClipboardToolbar";
 import { usePlanningClipboard } from "@/components/planning/usePlanningClipboard";
 import { PlanningItemDetailPanel } from "@/components/planning/PlanningItemDetailPanel";
 import { WeekPlanningBoard } from "@/components/planning/WeekPlanningBoard";
@@ -1554,15 +1553,19 @@ export default function Home() {
         ) : null}
         <section className="mx-auto max-w-[1500px]">
         <div className="space-y-3">
-          {planningSaveError ? (
-            <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">
-              {planningSaveError}
+          {isPlannerEditMode && planningClipboard.message ? (
+            <p role="status" className="pointer-events-none fixed left-1/2 top-3 z-50 max-w-[calc(100vw-24px)] -translate-x-1/2 rounded-md border border-perceel-line bg-white px-3 py-2 text-xs font-semibold text-perceel-green shadow-sm">
+              {planningClipboard.message}
+            </p>
+          ) : null}
+          {planningSaveError || planningClipboard.error ? (
+            <p role="alert" className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">
+              {planningSaveError || planningClipboard.error}
             </p>
           ) : null}
 
           {isPlannerEditMode ? (
             <div className="relative z-40 space-y-3">
-              {!planningClipboard.clipboard ? (
               <fieldset disabled={planningClipboard.busy} className="min-w-0">
               <PlanningForm
                 actionContext={actionContext}
@@ -1577,9 +1580,9 @@ export default function Home() {
                 onEditChange={updatePlanningItem}
                 onFlushPendingEdits={flushPendingPlanningItemSaves}
                 selectedCell={selectedCell}
+                suppressAutoFocus={Boolean(planningClipboard.clipboard)}
               />
               </fieldset>
-              ) : null}
 
               <div className="rounded-md border border-perceel-line bg-white px-3 py-2 text-xs shadow-sm">
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
@@ -1748,13 +1751,6 @@ export default function Home() {
           <div className="relative z-0">
             <WeekPlanningBoard
               cutItemId={planningClipboard.clipboard?.mode === "cut" ? planningClipboard.clipboard.item.id : undefined}
-              taskActions={isPlannerEditMode ? (
-                <PlanningClipboardToolbar
-                  controller={planningClipboard}
-                  selectedItem={selectedCardPlanningItem}
-                  destinationLabel={selectedCell && selectedCellEmployee ? `${getEmployeeDisplayName(selectedCellEmployee)} - ${selectedCell.date}` : undefined}
-                />
-              ) : null}
               activeDestinationCell={activeDestinationCell}
               conflicts={conflicts}
               days={days}

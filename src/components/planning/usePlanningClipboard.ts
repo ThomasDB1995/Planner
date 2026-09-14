@@ -36,6 +36,12 @@ export function usePlanningClipboard(options: Options) {
     setError("");
   }, [options.enabled, options.user?.id]);
 
+  useEffect(() => {
+    if (!message) return;
+    const timeout = setTimeout(() => setMessage(""), 2500);
+    return () => clearTimeout(timeout);
+  }, [message]);
+
   const canPaste = Boolean(options.enabled && options.ready && options.user && clipboard && options.destination &&
     !(clipboard.mode === "cut" && isSamePlanningCell(clipboard.item, options.destination)));
 
@@ -53,6 +59,7 @@ export function usePlanningClipboard(options: Options) {
       copyAttemptRef.current = null;
       setClipboard({ mode, item: { ...item, resourceIds: item.resourceIds?.slice() } });
       options.onStarted();
+      setMessage(mode === "cut" ? "Taak geknipt." : "Taak gekopieerd.");
     } catch {
       setError("Laatste wijziging niet opgeslagen. Probeer opnieuw voordat je knipt of kopieert.");
     } finally {
@@ -132,5 +139,5 @@ export function usePlanningClipboard(options: Options) {
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  return { clipboard, busy, message, error, canPaste, start, paste, cancel };
+  return { clipboard, busy, message, error };
 }
