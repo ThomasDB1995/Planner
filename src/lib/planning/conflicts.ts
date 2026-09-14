@@ -36,11 +36,12 @@ export function findPlanningConflicts(
   }
 
   for (const [key, groupedItems] of itemsByDateAndResource.entries()) {
-    if (groupedItems.length < 2) {
+    const employeeIds = new Set(groupedItems.map((item) => item.employeeId));
+
+    if (employeeIds.size < 2) {
       continue;
     }
 
-    const [firstItem] = groupedItems;
     const [date, resourceId] = key.split(":");
 
     if (!resourceId) {
@@ -53,7 +54,7 @@ export function findPlanningConflicts(
       id: `duplicate-${date}-${resourceId}`,
       type: "duplicate-resource",
       severity: "warning",
-      message: `${getResourceLabel(resource)} is meerdere keren ingepland op ${formatPlanningDate(date)}.`,
+      message: `${getResourceLabel(resource)} is bij meerdere werknemers ingepland op ${formatPlanningDate(date)}.`,
       date,
       resourceId,
       planningItemIds: groupedItems.map((item) => item.id)

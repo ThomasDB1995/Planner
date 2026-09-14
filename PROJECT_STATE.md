@@ -20,6 +20,7 @@ Geen actief implementatieticket. Sprint 32 T3201, T3202 en T3203 zijn afgerond e
 
 ## Completed
 
+- Praktijkfix 2026-09-14: resourceconflicts tellen verschillende werknemers per machine en datum. Meerdere taken met dezelfde machine bij dezelfde werknemer zijn toegestaan zonder waarschuwing. Regressietests: `node --test scripts/test-planning-conflicts.cjs`.
 - Sprint 32 Work Card Read-Only Preview afgerond
 - `WorkCardPreview` toegevoegd als compacte read-only werkkaart voor geselecteerde werknemer/dag
 - Werkkaart toont werknemer, datum, unieke resources en planningitems/opdrachten
